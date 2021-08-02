@@ -1,37 +1,40 @@
 <template>
   <div>
-    <form-generic :view-config="viewConfig" :model="data"> </form-generic>
-    <button @click="save">Guardar</button>
+    <div class="flex flex-row">
+      <div class="flex flex-col">
+        <form-generic :view-config="viewConfig" :model="data"> </form-generic>
+
+        <button @click="save">Guardar</button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
-  data() {
+  async asyncData() {
     return {
-      data: {},
+      data: {
+        nombre: 'Damian',
+        domicilio: '465 990',
+      },
       viewConfig: {
         nombre: {
           dataType: String,
           defaultValue: '',
         },
-        nacimiento: {
-          dataType: Date,
-          inputType: 'Date',
-          label: 'Fecha de Nacimiento',
-          defaultValue: '',
-        },
-        activo: {
-          dataType: Boolean,
-          inputType: 'checkbox',
-          defaultValue: '',
-        },
-        domicilio: {
-          dataType: String,
-          inputType: 'text',
-          defaultValue: '',
-        },
+        razonSocial: {},
+        domicilioFiscal: {},
+        domicilioEntrega: {},
+        documento: {},
+        telefono: {},
+        email: {},
       },
+    };
+  },
+  data() {
+    return {
+      viewConfig: {},
     };
   },
   methods: {
@@ -42,5 +45,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>

@@ -1,16 +1,34 @@
 <template>
-  <form>
-    <div v-for="field in fields" :key="field.name">
+  <form class="p-2">
+    <div v-for="field in getFields" :key="field.name">
       <div v-if="field.inputType === 'select'"></div>
       <div v-else-if="field.inputType === 'option'"></div>
       <div v-else-if="field.inputType === 'currency'"></div>
+      <div v-else-if="field.inputType === 'checkbox'">
+        <div class="flex flex-row items-center m-2">
+          <input
+            :id="field.name"
+            v-model="model[field.name]"
+            :type="field.inputType"
+            :placeholder="field.placeholder || field.label"
+            class="border-2 border-blue-300 focus:border-blue-500"
+          />
+          <label class="ml-1" :for="field.name">{{ field.label }}</label>
+        </div>
+      </div>
       <div v-else>
-        <label :for="field.name">{{ field.label }}</label>
-        <input
-          :id="field.name"
-          v-model="model[field.name]"
-          :type="field.inputType"
-        />
+        <div class="flex flex-row m-2">
+          <div class="flex flex-col">
+            <label :for="field.name">{{ field.label }}</label>
+            <input
+              :id="field.name"
+              v-model="model[field.name]"
+              :type="field.inputType"
+              :placeholder="field.placeholder || field.label"
+              class="border-2 border-blue-300 focus:border-blue-500"
+            />
+          </div>
+        </div>
       </div>
     </div>
   </form>
@@ -30,8 +48,10 @@ export default {
   data() {
     return { fields: [] };
   },
-  created() {
-    this.setFields();
+  computed: {
+    getFields() {
+      return this.setFields();
+    },
   },
   methods: {
     camelCaseToSpace(stringValue) {
@@ -101,11 +121,14 @@ export default {
           });
         }
       }
-      this.fields = dataProp;
+      //this.fields = dataProp;
 
       Object.entries(this.viewConfig).forEach((element) => {
-        this.model[element[0]] = element[1].defaultValue;
+        if (!this.model[element[0]])
+          this.model[element[0]] =  element[1].defaultValue;
       });
+      console.log(this.model);
+      return dataProp;
     },
   },
 };
