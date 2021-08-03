@@ -1,7 +1,7 @@
 <template>
   <div class="">
     <ul v-for="item of items" :key="item.id">
-      <nuxt-link to="/custumers" >
+      <nuxt-link :to="'customers/' + item.id">
         <list-item :title="item.nombre" :subtitle1="item.domicilio" />
       </nuxt-link>
     </ul>
@@ -15,13 +15,13 @@ export default {
   data() {
     return {
       items: [
-        { nombre: 'damian', domicilio: '465 990' },
-        { nombre: 'Saulo', domicilio: 'no se, pero es en Olavarria' },
+        { id: 1, nombre: 'damian', domicilio: '465 990' },
+        { id: 2, nombre: 'Saulo', domicilio: 'no se, pero es en Olavarria' },
+        { id: 3, nombre: 'otro', domicilio: 'pampa y la via' },
       ],
     };
   },
 };
 </script>
 
-<style>
-</style>
+<style></style>

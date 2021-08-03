@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-row">
+  <div class="flex-row p-2 border border-black">
     <div class="flex-col"></div>
     <div class="flex-col">
       <p class="text-base">{{ title }}</p>
