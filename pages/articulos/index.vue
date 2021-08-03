@@ -1,23 +1,35 @@
 <template>
-  <div class="bg-gray-300">
-    <div class="flex flex-row">
-      <div class="flex flex-col">
-        <input v-model="search" placeholder="Buscar" class="m-2" type="text" />
+  <div>
+    <div class="flex bg w-full p-1">
+      <div class="flex bg-white items-center">
+        <img src="~/assets/lupa.svg" class="w-3 h-3 ml-2" alt="" />
+        <input
+          v-model="search"
+          placeholder="Buscar producto"
+          class="m-2 focus:outline-none"
+          type="text"
+        />
       </div>
       <div v-if="totalComprado" class="flex flex-col">
         Total:${{ totalComprado }}
       </div>
     </div>
-    <ul v-for="item in filteredProducts" :key="item.id" class="p-1">
-      <item-catalogue
-        :title="item.name"
-        :subtitle="'Precio: $' + item.price"
-        :image="item.image"
-        :price="item.price"
-        :amount="item.amount"
-        @changeAmount="addOrder($event, item)"
-      ></item-catalogue>
-    </ul>
+    <div class="flex flex-wrap w-full">
+      <ul
+        v-for="item in filteredProducts"
+        :key="item.id"
+        class="p-1 xl:w-1/2 lg:w-1/2 w-full"
+      >
+        <item-catalogue
+          :title="item.name"
+          :subtitle="'Precio: $' + item.price"
+          :image="item.image"
+          :price="item.price"
+          :amount="item.amount"
+          @changeAmount="addOrder($event, item)"
+        ></item-catalogue>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -33,6 +45,48 @@ export default {
 
     return {
       products: [
+        {
+          name: 'Aceite de Girasol "Pureza" x 950cc',
+          price: 50,
+          image:
+            'https://www.conradomarket.com.ar/images/000000000000027514835Aceite-Pureza-Girasol-900ml.jpg',
+          amount: 0,
+        },
+        {
+          name: 'Aceite de Girasol "Cocinero" 1,5lt',
+          price: 50,
+          image:
+            'https://www.almacenweb.com.ar/4563-large_default/aceite-girasol-cocinero-15-l.jpg',
+          amount: 0,
+        },
+        {
+          name: 'Aceite de Girasol "Pureza" x 950cc',
+          price: 50,
+          image:
+            'https://www.conradomarket.com.ar/images/000000000000027514835Aceite-Pureza-Girasol-900ml.jpg',
+          amount: 0,
+        },
+        {
+          name: 'Aceite de Girasol "Cocinero" 1,5lt',
+          price: 50,
+          image:
+            'https://www.almacenweb.com.ar/4563-large_default/aceite-girasol-cocinero-15-l.jpg',
+          amount: 0,
+        },
+        {
+          name: 'Aceite de Girasol "Pureza" x 950cc',
+          price: 50,
+          image:
+            'https://www.conradomarket.com.ar/images/000000000000027514835Aceite-Pureza-Girasol-900ml.jpg',
+          amount: 0,
+        },
+        {
+          name: 'Aceite de Girasol "Cocinero" 1,5lt',
+          price: 50,
+          image:
+            'https://www.almacenweb.com.ar/4563-large_default/aceite-girasol-cocinero-15-l.jpg',
+          amount: 0,
+        },
         {
           name: 'Aceite de Girasol "Pureza" x 950cc',
           price: 50,
@@ -91,3 +145,9 @@ export default {
   },
 };
 </script>
+
+<style lang="postcss" scoped>
+.bg {
+  background: #72727279;
+}
+</style>

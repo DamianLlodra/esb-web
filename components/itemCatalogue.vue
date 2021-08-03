@@ -1,28 +1,23 @@
 <template>
-  <div
-    class="
-      flex flex-row
-      p-1
-      border border-solid border-black
-      rounded-md
-      bg-white bg-opacity-100
-    "
-  >
+  <div class="flex p-2 bg-white bg-opacity-100 shadow-b">
     <div class="md:flex-shrink-0">
       <img class="w-20 h-20 scale-0 rounded-md" :src="image" />
     </div>
     <div class="flex flex-col ml-2">
-      <p>{{ title }}</p>
-      <p>{{ subtitle }}</p>
+      <p class="font-semibold">{{ title }}</p>
+      <p class="font-bold">{{ subtitle }}</p>
       <div class="flex flex-row">
-        <span v-if="amountLocal === 0" class="mr-2" @click="changeAmount(1)"
-          >Pedir</span
+        <span
+          v-if="amountLocal === 0"
+          class="mr-2 p-1 bg rounded-lg cursor-pointer"
+          @click="changeAmount(1)"
+          >Agregar</span
         >
-        <div v-if="amountLocal">
-          <span class="mr-2">Pedir:</span>
-          <button class="w-5" @click="changeAmount(-1)">-</button>
+        <div v-if="amountLocal" class="flex items-center">
+          <span class="mr-2 p-1 bg rounded-lg">Agregado</span>
+          <button class="subtract" @click="changeAmount(-1)">-</button>
           <span class="mx-2">{{ amountLocal }}</span>
-          <button class="w-5" @click="changeAmount(1)">+</button>
+          <button class="add" @click="changeAmount(1)">+</button>
           <span class="mx-2">Importe: ${{ amountLocal * price }}</span>
         </div>
       </div>
@@ -56,4 +51,26 @@ export default {
 };
 </script>
 
-<style></style>
+<style lang="postcss" scoped>
+.shadow-b {
+  -webkit-box-shadow: 0 8px 6px -6px black;
+  -moz-box-shadow: 0 8px 6px -6px black;
+  box-shadow: 0 8px 6px -6px black;
+}
+.bg {
+  background: #91919185;
+}
+.bg:hover {
+  background: #76a1de85;
+}
+.add {
+  background: #42db42;
+}
+.subtract {
+  background: #db4739;
+}
+.add,
+.subtract {
+  @apply rounded-full w-5 h-5 font-bold flex items-center justify-center focus:outline-none;
+}
+</style>
