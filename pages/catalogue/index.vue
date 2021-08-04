@@ -1,11 +1,17 @@
 <template>
-  <div class="bg-gray-300">
-    <div class="flex flex-row">
-      <div class="flex flex-col">
-        <input v-model="search" placeholder="Buscar" class="m-2" type="text" />
+  <div>
+    <div class="flex bg-gray-400 w-full p-3">
+      <div class="flex bg-white items-center mr-2">
+        <img src="~/assets/lupa.svg" class="w-3 h-3 ml-2" alt="" />
+        <input
+          v-model="search"
+          placeholder="Buscar producto"
+          class="m-2 focus:outline-none"
+          type="text"
+        />
       </div>
-      <div class="flex flex-col">
-        Total:${{ totalComprado }}
+      <div class="flex flex-col self-end font-semibold">
+        Total: ${{ totalComprado }}
       </div>
     </div>
     <ul v-for="item in filteredProducts" :key="item.id" class="p-1">
