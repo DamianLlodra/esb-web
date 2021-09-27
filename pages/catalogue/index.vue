@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex bg-gray-400 w-full p-3">
+    <div class="flex bg-yellow-400 w-full p-3">
       <div class="flex bg-white items-center mr-2">
         <img src="~/assets/lupa.svg" class="w-3 h-3 ml-2" alt="" />
         <input

@@ -25,7 +25,12 @@ export default {
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: ['@nuxt/typescript-build', '@nuxtjs/tailwindcss'],
 
-  modules: ['@nuxtjs/axios', '@nuxtjs/pwa', '@nuxtjs/strapi'],
+  modules: [
+    '@nuxtjs/axios',
+    '@nuxtjs/pwa',
+    '@nuxtjs/strapi',
+    '@nuxtjs/auth',
+  ],
 
   strapi: {
     url: process.env.STRAPI_URL || 'http://localhost:1337',
@@ -36,7 +41,7 @@ export default {
     ],
   },
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
-  axios: {},
+  axios: { baseURL: process.env.STRAPI_URL || 'http://localhost:1337' },
 
   // PWA module configuration: https://go.nuxtjs.dev/pwa
   pwa: {
@@ -47,4 +52,31 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
+
+  auth: {
+    redirect: {
+      login: '/auth/login',
+      logout: '/',
+      callback: '/auth/login',
+      home: '/',
+      register: '/auth/register',
+    },
+    strategies: {
+      local: {
+        endpoints: {
+          login: {
+            url: 'auth/local',
+            method: 'post',
+            propertyName: 'jwt',
+          },
+          user: {
+            url: 'users/me',
+            method: 'get',
+            propertyName: false,
+          },
+          logout: false,
+        },
+      },
+    },
+  },
 };

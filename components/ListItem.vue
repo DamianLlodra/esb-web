@@ -1,11 +1,26 @@
 <template>
-  <div class="flex-row p-2 border border-black">
+  <!--  <div class="flex flex-row p-2 border border-black items-center">
     <div class="flex-col"></div>
-    <div class="flex-col">
+    <div class="flex-col ">
       <p class="text-base">{{ title }}</p>
       <p class="text-sm">{{ subtitle1 }}</p>
       <p class="text-sm">{{ subtitle2 }}</p>
     </div>
+  </div> -->
+  <div class="bg-gray-100 rounded px-6">
+    <div class="flex justify-between my-4">
+      <div class="w-16">
+        <img
+          class="w-12 h-12 rounded-full"
+          src="https://source.unsplash.com/50x50/?nature"
+        />
+      </div>
+      <div class="flex-1 pl-2">
+        <div class="text-gray-700 font-semibold">{{ title }}</div>
+        <div class="text-gray-600 font-thin">{{ subtitle1 }}</div>
+      </div>
+    </div>
+    <hr class="boder-b-0 my-4" />
   </div>
 </template>
 

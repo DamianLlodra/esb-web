@@ -34,10 +34,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import { mapState } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import itemCatalogue from '~/components/itemCatalogue.vue';
-
 export default {
   components: { itemCatalogue },
   async asyncData({ $strapi }) {

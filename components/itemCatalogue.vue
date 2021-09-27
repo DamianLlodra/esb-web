@@ -1,5 +1,5 @@
 <template>
-  <div class="flex p-2 bg-white bg-opacity-100 shadow-b">
+  <div class="flex p-2 bg-white bg-opacity-100 shadow-g">
     <div class="md:flex-shrink-0">
       <img class="w-20 h-20 scale-0 rounded-md" :src="image" />
     </div>
@@ -56,6 +56,11 @@ export default {
   -webkit-box-shadow: 0 8px 6px -6px black;
   -moz-box-shadow: 0 8px 6px -6px black;
   box-shadow: 0 8px 6px -6px black;
+}
+.shadow-g {
+  -webkit-box-shadow: 0 8px 6px -6px green;
+  -moz-box-shadow: 0 8px 6px -6px green;
+  box-shadow: 0 8px 6px -6px green;
 }
 .bg {
   background: #91919185;

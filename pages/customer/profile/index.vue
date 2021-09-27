@@ -1,23 +1,19 @@
 <template>
   <div>
-    <div class="flex flex-row">
-      <div class="flex flex-col">
-        <form-generic :view-config="viewConfig" :model="data"> </form-generic>
+    <div class="flex flex-col justify-center">
+      <form-generic :view-config="viewConfig" :model="data"> </form-generic>
 
-        <button @click="save">Guardar</button>
-      </div>
+      <button @click="save">Guardar</button>
     </div>
   </div>
 </template>
 
 <script>
 export default {
+  middleware: 'auth',
   async asyncData() {
     return {
-      data: {
-        nombre: 'Damian',
-        domicilio: '465 990',
-      },
+      data: {},
       viewConfig: {
         nombre: {
           dataType: String,

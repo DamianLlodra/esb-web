@@ -17,7 +17,7 @@
         </div>
       </div>
       <div v-else>
-        <div class="flex flex-row m-2">
+        <div class="flex flex-row m-2 justify-center">
           <div class="flex flex-col">
             <label :for="field.name">{{ field.label }}</label>
             <input
@@ -25,7 +25,7 @@
               v-model="model[field.name]"
               :type="field.inputType"
               :placeholder="field.placeholder || field.label"
-              class="border-2 border-blue-300 focus:border-blue-500"
+              class="border-2 border-green-300 focus:border-green-500"
             />
           </div>
         </div>
