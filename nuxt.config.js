@@ -25,12 +25,7 @@ export default {
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: ['@nuxt/typescript-build', '@nuxtjs/tailwindcss'],
 
-  modules: [
-    '@nuxtjs/axios',
-    '@nuxtjs/pwa',
-    '@nuxtjs/strapi',
-    '@nuxtjs/auth',
-  ],
+  modules: ['@nuxtjs/axios', '@nuxtjs/pwa', '@nuxtjs/strapi', '@nuxtjs/auth'],
 
   strapi: {
     url: process.env.STRAPI_URL || 'http://localhost:1337',
