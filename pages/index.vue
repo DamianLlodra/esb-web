@@ -1,12 +1,15 @@
 <template>
-  <div class="container"></div>
+  <div class="container">
+    <home></home>
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import Home from '../components/Home.vue';
 
-export default Vue.extend({
-  middleware: 'auth',
+export default new Vue({
+  components: { Home },
 });
 </script>
 
