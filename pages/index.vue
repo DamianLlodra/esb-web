@@ -1,11 +1,14 @@
 <template>
-  <div class="container"></div>
+  <home></home>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import Home from '../components/Home.vue';
 
-export default Vue.extend({});
+export default new Vue({
+  components: { Home },
+});
 </script>
 
 <style>

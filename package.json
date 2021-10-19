@@ -19,11 +19,13 @@
     "nuxt": "^2.15.3"
   },
   "devDependencies": {
+    "@mdi/font": "^6.2.95",
     "@nuxt/types": "^2.15.3",
     "@nuxt/typescript-build": "^2.1.0",
     "@nuxtjs/eslint-config-typescript": "^6.0.0",
     "@nuxtjs/eslint-module": "^3.0.2",
     "@nuxtjs/tailwindcss": "^4.0.1",
+    "@nuxtjs/vuetify": "^1.12.1",
     "babel-eslint": "^10.1.0",
     "eslint": "^7.22.0",
     "eslint-config-prettier": "^8.1.0",

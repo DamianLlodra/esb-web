@@ -1,16 +1,41 @@
 <template>
-  <div>
-    <Nav></Nav>
-    <Nuxt />
-  </div>
+  <v-app>
+    <v-navigation-drawer v-model="drawer" app>
+      <main-menu></main-menu>
+    </v-navigation-drawer>
+
+    <v-app-bar app color="#4CAF50">
+      <!-- <Nav></Nav> -->
+      <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
+
+      <v-toolbar-title>ESB</v-toolbar-title>
+    </v-app-bar>
+
+    <!-- Sizes your content based upon application components -->
+    <v-main>
+      <!-- Provides the application the proper gutter -->
+      <v-container fluid>
+        <!-- If using vue-router -->
+        <!-- <router-view></router-view> -->
+        <Nuxt />
+      </v-container>
+    </v-main>
+
+    <v-footer app>
+      <!-- -->
+    </v-footer>
+  </v-app>
 </template>
 
 <script>
-import Nav from '~/components/Nav.vue';
+import MainMenu from '../components/MainMenu.vue';
 export default {
-  components: {
-    Nav,
-  },
+  components: { MainMenu },
+  data: () => ({
+    drawer: false,
+    group: null,
+    right: null,
+  }),
 };
 </script>
 

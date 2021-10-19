@@ -11,7 +11,7 @@
 <script>
 export default {
   middleware: 'auth',
-  async asyncData() {
+  asyncData() {
     return {
       data: {},
       viewConfig: {

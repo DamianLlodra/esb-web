@@ -1,6 +1,8 @@
 export default {
   // Target: https://go.nuxtjs.dev/config-target
   target: 'static',
+  ssr: false,
+  generate: { fallback: true },
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
@@ -17,20 +19,19 @@ export default {
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [],
+  plugins: ['~plugins/vuetify.js'],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
-  buildModules: ['@nuxt/typescript-build', '@nuxtjs/tailwindcss'],
-
-  modules: [
-    '@nuxtjs/axios',
-    '@nuxtjs/pwa',
-    '@nuxtjs/strapi',
-    '@nuxtjs/auth',
+  buildModules: [
+    '@nuxt/typescript-build',
+    '@nuxtjs/tailwindcss',
+    '@nuxtjs/vuetify',
   ],
+
+  modules: ['@nuxtjs/axios', '@nuxtjs/pwa', '@nuxtjs/strapi', '@nuxtjs/auth'],
 
   strapi: {
     url: process.env.STRAPI_URL || 'http://localhost:1337',
