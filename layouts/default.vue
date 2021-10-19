@@ -1,9 +1,4 @@
 <template>
-  <!-- <div>
-    <Nav></Nav>
-    <Nuxt />
-  </div> -->
-
   <v-app>
     <v-navigation-drawer v-model="drawer" app>
       <main-menu></main-menu>

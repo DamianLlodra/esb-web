@@ -10,7 +10,12 @@
     <v-divider></v-divider>
 
     <v-list dense nav>
-      <v-list-item v-for="item in items" :key="item.title" link>
+      <v-list-item
+        v-for="item in items"
+        :key="item.title"
+        link
+        @click="to(item.path)"
+      >
         <v-list-item-icon>
           <v-icon>{{ item.icon }}</v-icon>
         </v-list-item-icon>
@@ -28,12 +33,20 @@ export default {
   data() {
     return {
       items: [
-        { title: 'Catalogo', icon: 'mdi-view-dashboard' },
-        { title: 'Carrito', icon: 'mdi-cart' },
-        { title: 'Mis compras', icon: 'mdi-image' },
-        { title: 'Mis datos', icon: 'mdi-account' },
+        { title: 'Catalogo', icon: 'mdi-view-dashboard', path: '/catalogue' },
+        { title: 'Carrito', icon: 'mdi-cart', path: '/cart' },
+        { title: 'Mis compras', icon: 'mdi-image', path: '/customer/orders' },
+        { title: 'Mis datos', icon: 'mdi-account', path: '/customer/profile' },
       ],
     };
+  },
+  methods: {
+    to(path) {
+      this.$router.push(path);
+    },
+    async logout() {
+      await this.$auth.logout();
+    },
   },
 };
 </script>

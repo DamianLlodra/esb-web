@@ -2,11 +2,11 @@
   <div class="">
     <div class="flex flex-col justify-center">
       <ul v-for="item of items" :key="item.id">
-        <nuxt-link :to="'customers/' + item.id">
+        <nuxt-link :to="'/admin/customers/' + item.id">
           <list-item :title="item.nombre" :subtitle1="item.domicilio" />
         </nuxt-link>
       </ul>
-      <nuxt-link class="button" :to="'customers/new'">Nuevo</nuxt-link>
+      <nuxt-link class="button" :to="'new'">Nuevo</nuxt-link>
     </div>
   </div>
 </template>
