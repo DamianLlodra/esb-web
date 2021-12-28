@@ -14,7 +14,7 @@
           >Agregar</span
         >
         <div v-if="amountLocal" class="flex items-center">
-          <span class="mr-2 p-1 bg rounded-lg">Agregado</span>
+          <!-- <span class="mr-2 p-1 bg rounded-lg">Agregado</span> -->
           <button class="subtract" @click="changeAmount(-1)">-</button>
           <span class="mx-2">{{ amountLocal }}</span>
           <button class="add" @click="changeAmount(1)">+</button>
@@ -76,6 +76,6 @@ export default {
 }
 .add,
 .subtract {
-  @apply rounded-full w-5 h-5 font-bold flex items-center justify-center focus:outline-none;
+  @apply rounded-full w-8 h-8 font-bold flex items-center justify-center focus:outline-none;
 }
 </style>

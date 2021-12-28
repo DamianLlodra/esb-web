@@ -1,13 +1,18 @@
 <template>
-  <v-carousel>
-    <v-carousel-item
-      v-for="(item, i) in items"
-      :key="i"
-      :src="item.src"
-      reverse-transition="fade-transition"
-      transition="fade-transition"
-    ></v-carousel-item>
-  </v-carousel>
+  <v-container fluid>
+    <v-carousel>
+      <v-carousel-item
+        v-for="(item, i) in items"
+        :key="i"
+        :src="item.src"
+        reverse-transition="fade-transition"
+        transition="fade-transition"
+      ></v-carousel-item>
+    </v-carousel>
+    <v-input>Categorias</v-input>
+    <v-input>Productos</v-input>
+    <v-input>Ofertas</v-input>
+  </v-container>
 </template>
 
 <script>

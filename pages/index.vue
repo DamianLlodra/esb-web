@@ -6,9 +6,11 @@
 import Vue from 'vue';
 import Home from '../components/Home.vue';
 
-export default new Vue({
+export default {
   components: { Home },
-});
+  middleware: ['router-auth'],
+  
+};
 </script>
 
 <style>

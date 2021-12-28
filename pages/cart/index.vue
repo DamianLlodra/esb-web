@@ -1,15 +1,35 @@
 <template>
-  <div class="bg-gray-300">
-    <ul v-for="item in cart" :key="item.id" class="p-2">
-      <item-catalogue
-        :title="item.name"
-        :subtitle="'Precio: $' + item.price"
-        :image="item.image"
-        :price="item.price"
-        :amount="item.amount"
-        @changeAmount="addOrder($event, item)"
-      ></item-catalogue>
-    </ul>
+  <div class="div">
+    <v-card>
+      <v-virtual-scroll bench="5" :items="cart" item-height="155" height="400">
+        <template v-slot:default="{ item, index }">
+          <item-catalogue
+            max-height="155"
+            :key="index"
+            :title="item.name"
+            :subtitle="'Precio: $' + item.price"
+            :image="item.image"
+            :price="item.price"
+            :amount="item.amount"
+            @changeAmount="addOrder($event, item)"
+          ></item-catalogue>
+        </template>
+      </v-virtual-scroll>
+    </v-card>
+    <v-bottom-navigation v-if="cart.length > 0">
+      <v-btn @click="removeAll">
+        <v-icon>mdi-delete</v-icon>
+        Eliminar todo
+      </v-btn>
+      <v-btn @click="goToCart">
+        <v-icon>mdi-cart</v-icon>
+        <span>Seguir Comprando</span>
+      </v-btn>
+      <v-btn @click="goToCheckout">
+        <v-icon>mdi-check</v-icon>
+        <span>Confirmar Pedido</span>
+      </v-btn>
+    </v-bottom-navigation>
   </div>
 </template>
 
@@ -35,6 +55,15 @@ export default {
   methods: {
     addOrder(amount, item) {
       this.$store.commit('cart/addChangeItemCart', { amount, item });
+    },
+    removeAll() {
+      this.$store.commit('cart/removeAll');
+    },
+    goToCart() {
+      this.$router.push('/category/');
+    },
+    goToCheckout() {
+      this.$router.push('/checkout');
     },
   },
 };

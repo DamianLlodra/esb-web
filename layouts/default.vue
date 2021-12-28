@@ -1,41 +1,66 @@
 <template>
   <v-app>
-    <v-navigation-drawer v-model="drawer" app>
+    <v-navigation-drawer v-model="drawer" app absolute temporary>
       <main-menu></main-menu>
     </v-navigation-drawer>
-
     <v-app-bar app color="#4CAF50">
-      <!-- <Nav></Nav> -->
       <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
+      <v-divider class="mx-2" inset vertical></v-divider>
+      <v-toolbar-title>ESB </v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-divider class="mx-2" inset vertical></v-divider>
 
-      <v-toolbar-title>ESB</v-toolbar-title>
+      <div @click="goTo('/checkout')">
+        <v-icon>mdi-cart</v-icon>${{ totalComprado }}
+      </div>
     </v-app-bar>
 
-    <!-- Sizes your content based upon application components -->
     <v-main>
-      <!-- Provides the application the proper gutter -->
-      <v-container fluid>
-        <!-- If using vue-router -->
-        <!-- <router-view></router-view> -->
-        <Nuxt />
-      </v-container>
+      <Nuxt />
     </v-main>
 
-    <v-footer app>
-      <!-- -->
-    </v-footer>
+    <!-- <v-footer app>
+    </v-footer> -->
   </v-app>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import MainMenu from '../components/MainMenu.vue';
+import data from '../functions/data.js';
+
 export default {
   components: { MainMenu },
+
   data: () => ({
     drawer: false,
     group: null,
     right: null,
+    contador: 0,
   }),
+  computed: {
+    ...mapGetters({
+      totalComprado: 'cart/totalComprado',
+    }),
+  },
+  created() {
+    data.updateLocalCatalog(this);
+  },
+  mounted() {
+    const lsCart = localStorage.getItem('cart');
+    if (lsCart) {
+      const cart = JSON.parse(lsCart);
+      this.$store.commit('cart/load', cart);
+    }
+  },
+  methods: {
+    goTo(path) {
+      this.$router.push(path);
+    },
+    load() {
+      data.updateLocalCatalog(this);
+    },
+  },
 };
 </script>
 

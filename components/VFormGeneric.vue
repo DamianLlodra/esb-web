@@ -1,4 +1,5 @@
 <template>
+    <!-- //TODO CAMPOS PARA QUE TRABAJEN CON VUETIFY -->
   <form class="p-2">
     <div v-for="field in getFields" :key="field.name">
       <div v-if="field.inputType === 'select'"></div>

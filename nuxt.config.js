@@ -19,7 +19,7 @@ export default {
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['~plugins/vuetify.js'],
+  plugins: ['~plugins/vuetify.js', '~plugins/firebase.js'],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -31,16 +31,8 @@ export default {
     '@nuxtjs/vuetify',
   ],
 
-  modules: ['@nuxtjs/axios', '@nuxtjs/pwa', '@nuxtjs/strapi', '@nuxtjs/auth'],
+  modules: ['@nuxtjs/axios', '@nuxtjs/pwa', '@nuxtjs/strapi'],
 
-  strapi: {
-    url: process.env.STRAPI_URL || 'http://localhost:1337',
-    entities: [
-      { name: 'articulos', type: 'collection' },
-      { name: 'catalogue', type: 'collection' },
-      { name: 'categorias', type: 'collection' },
-    ],
-  },
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: { baseURL: process.env.STRAPI_URL || 'http://localhost:1337' },
 
@@ -54,30 +46,7 @@ export default {
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
 
-  auth: {
-    redirect: {
-      login: '/auth/login',
-      logout: '/',
-      callback: '/auth/login',
-      home: '/',
-      register: '/auth/register',
-    },
-    strategies: {
-      local: {
-        endpoints: {
-          login: {
-            url: 'auth/local',
-            method: 'post',
-            propertyName: 'jwt',
-          },
-          user: {
-            url: 'users/me',
-            method: 'get',
-            propertyName: false,
-          },
-          logout: false,
-        },
-      },
-    },
+  router: {
+    middleware: 'router-auth',
   },
 };

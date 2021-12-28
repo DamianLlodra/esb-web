@@ -10,10 +10,7 @@
   <div class="bg-gray-100 rounded px-6">
     <div class="flex justify-between my-4">
       <div class="w-16">
-        <img
-          class="w-12 h-12 rounded-full"
-          src="https://source.unsplash.com/50x50/?nature"
-        />
+        <img v-if="image" class="w-12 h-12 rounded-full" :src="image" />
       </div>
       <div class="flex-1 pl-2">
         <div class="text-gray-700 font-semibold">{{ title }}</div>
@@ -36,6 +33,10 @@ export default {
       default: () => '',
     },
     subtitle2: {
+      type: String,
+      default: () => '',
+    },
+    image: {
       type: String,
       default: () => '',
     },

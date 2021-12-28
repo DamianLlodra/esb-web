@@ -9,15 +9,14 @@
 </template>
 
 <script>
+
 export default {
-  middleware: 'auth',
   asyncData() {
     return {
       data: {},
       viewConfig: {
         nombre: {
           dataType: String,
-          defaultValue: '',
         },
         razonSocial: {},
         domicilioFiscal: {},
@@ -30,12 +29,23 @@ export default {
   },
   data() {
     return {
-      viewConfig: {},
+      data: {},
+    };
+  },
+  mounted() {
+    const { displayName, email, phoneNumber } = this.$store.state.user.user;
+    this.data = {
+      nombre: displayName,
+      email,
+      telefono: phoneNumber,
     };
   },
   methods: {
     save() {
-      alert(this.data.nombre);
+      this.$dal.save('customer', this.data).then(() => {        
+        this.$store.commit('user/setUser', this.data);
+        this.$router.push('/');
+      });
     },
   },
 };
