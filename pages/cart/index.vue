@@ -57,7 +57,10 @@ export default {
       this.$store.commit('cart/addChangeItemCart', { amount, item });
     },
     removeAll() {
+      //TODO: add confirm alert
       this.$store.commit('cart/removeAll');
+      //TODO: go to category
+
     },
     goToCart() {
       this.$router.push('/category/');

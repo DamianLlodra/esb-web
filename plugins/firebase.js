@@ -4,7 +4,7 @@ import 'firebase/database';
 import 'firebase/firestore';
 import 'firebase/auth';
 
-export default ({ env, store }, inject) => {
+export default ({},inject) => {
   const config = {
     apiKey: 'AIzaSyASVQfM8XTnTeJ-XORJIzbFAOe2auVRrKc',
     authDomain: 'esb-web.firebaseapp.com',
@@ -26,7 +26,6 @@ export default ({ env, store }, inject) => {
 
   const dal = {
     async save(collection, data) {
-      console.log(data.id);
       return await firebase
         .firestore()
         .collection(collection)
@@ -105,6 +104,85 @@ export default ({ env, store }, inject) => {
             data.push(doc.data());
           });
           return data;
+        });
+    },
+    async getDataPaging(collection, page, limit) {
+      const startAfter = page > 1 ? page * limit : 0;
+      return await firebase
+        .firestore()
+        .collection(collection)
+        .orderBy('id')
+        .startAfter(startAfter)
+        .limit(limit)
+        .get()
+        .then((snapshot) => {
+          const data = [];
+          snapshot.forEach((doc) => {
+            data.push(doc.data());
+          });
+          return data;
+        });
+    },
+    getPaginator(collection, order, limit) {
+      return {
+        collection,
+        order,
+        limit,
+        lastDocument: null,
+        data: [],
+      };
+    },
+    async getFirstPage(paginator) {
+      return await firebase
+        .firestore()
+        .collection(paginator.collection)
+        .orderBy(paginator.order)
+        .limit(paginator.limit)
+        .get()
+        .then((snapshot) => {
+          const data = [];
+          snapshot.forEach((doc) => {
+            data.push(doc.data());
+          });
+          paginator.data = data;
+          paginator.lastDocument = snapshot.docs[snapshot.docs.length - 1];
+          return paginator;
+        });
+    },
+    async getNextPage(paginator) {
+      return await firebase
+        .firestore()
+        .collection(paginator.collection)
+        .orderBy(paginator.order)
+        .startAfter(paginator.lastDocument)
+        .limit(paginator.limit)
+        .get()
+        .then((snapshot) => {
+          const data = [];
+          snapshot.forEach((doc) => {
+            data.push(doc.data());
+          });
+          paginator.data = data;
+          paginator.lastDocument = snapshot.docs[snapshot.docs.length - 1];
+          return paginator;
+        });
+    },
+    async getPreviousPage(paginator) {
+      return await firebase
+        .firestore()
+        .collection(paginator.collection)
+        .orderBy(paginator.order)
+        .endBefore(paginator.lastDocument)
+        .limit(paginator.limit)
+        .get()
+        .then((snapshot) => {
+          const data = [];
+          snapshot.forEach((doc) => {
+            data.push(doc.data());
+          });
+          paginator.data = data;
+          paginator.lastDocument = snapshot.docs[snapshot.docs.length - 1];
+          return paginator;
         });
     },
   };

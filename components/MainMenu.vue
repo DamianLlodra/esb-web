@@ -56,6 +56,11 @@ export default {
         },
         { title: 'Productos', icon: 'mdi-shopping', path: '/admin/products' },
         {
+          title: 'Actualizacion masiva',
+          icon: 'mdi-upload',
+          path: '/admin/masive-update',
+        },
+        {
           title: 'Categorias',
           icon: 'mdi-folder-multiple',
           path: '/admin/categories',

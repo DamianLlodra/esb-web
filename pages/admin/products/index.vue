@@ -2,8 +2,8 @@
   <div class="">
     <v-virtual-scroll
       ref="vs"
-      :items="items"
-      item-height="150"
+      :items="paginator.data"
+      item-height="50"
       class="pa-0"
       style="max-height: calc(100vh - 200px)"
     >
@@ -14,27 +14,27 @@
             class="d-flex align-items-center"
             :class="{ 'bg-primary': item.id === selectedProduct.id }"
           >
-            <v-list-title class="text-white">
-              {{ item.name }}
-            </v-list-title>
+            <v-list-item-title>
+              {{ item.producto }}
+            </v-list-item-title>
+            <v-list-item-subtitle> {{ item.lista }} </v-list-item-subtitle>
           </v-list-item>
-          <!--  <list-item :title="item.producto" :subtitle1="'$' + item.lista" />-->
         </nuxt-link>
       </template>
     </v-virtual-scroll>
 
-    <div class="flex flex-col p-2">
-      <button @click="New">Nuevo</button>
-      <button @click="Show">Importar</button>
-
-      <input ref="file" type="file" @change="updateProducts" />
-      <!--  <v-progress-linear v-model="progressCsv" color="blue-grey" height="25">
-        <template v-slot:default="{ value }">
-          <strong>{{ Math.ceil(value) }}%</strong>
-        </template>
-      </v-progress-linear> -->
-      <v-img :src="imagen"></v-img>
-    </div>
+    <v-bottom-navigation class="mt-3" fixed color="primary">
+      <v-btn :enabled="currentPage > 1" @click="previusPag()">
+        <v-icon>mdi-arrow-left</v-icon></v-btn
+      >
+      <div class="flex items-center">
+        <input v-model="search" placeholder="Buscar producto" type="text" />
+        <v-btn><v-icon>mdi-magnify</v-icon></v-btn>
+      </div>
+      <v-btn :enabled="currentPage > 1" @click="nextPage()">
+        <v-icon>mdi-arrow-right</v-icon></v-btn
+      >
+    </v-bottom-navigation>
   </div>
 </template>
 
@@ -48,204 +48,30 @@ export default {
       categories: [],
       progressCSV: 0,
       selectedProduct: {},
+      currentPage: 1,
+      itemsPerPage: 3,
+      hasMore: true,
+      search: '',
+      paginator: { data: [] },
     };
   },
-  computed: {},
-  created() {
-    //this.load();
+  async created() {
+    const paginator = this.$dal.getPaginator(
+      'products',
+      'id',
+      this.itemsPerPage
+    );
+
+    this.paginator = await this.$dal.getFirstPage(paginator);
   },
   methods: {
-    load() {
-      this.$dal.getAll('products').then((res) => {
-        this.items = res;
-      });
+    async previusPage() {
+      this.paginator = await this.$dal.getPreviusPage(this.paginator);
     },
-    async updateProducts() {
-      const file = this.$refs.file.files[0];
-      if (!file) {
-        return;
-      }
-
-      const { productsFromCsv, categoriesFromCsv, subcategoriesFromCsv } =
-        await this.loadCsvAsync(file);
-
-      if (productsFromCsv.length === 0) {
-        return;
-      }
-      const { productsFromDB, categoriesFromDB, subcategoriesFromDB } =
-        await this.loadDBAsync();
-
-      const productsToUpdate = this.compareProducts(
-        productsFromCsv,
-        productsFromDB
-      );
-
-      const categoriesToUpdate = this.compareCategories(
-        categoriesFromCsv,
-        categoriesFromDB
-      );
-
-      const subcategoriesToUpdate = this.compareSubcategories(
-        subcategoriesFromCsv,
-        subcategoriesFromDB
-      );
-      if (productsToUpdate.length > 0) {
-        await this.$dal.saveAll('products', productsToUpdate);
-      }
-      if (categoriesToUpdate.length > 0) {
-        await this.$dal.saveAll('categories', categoriesToUpdate);
-      }
-      if (subcategoriesToUpdate.length > 0) {
-        await this.$dal.saveAll('subcategories', subcategoriesToUpdate);
-      }
+    async nextPage() {
+      this.paginator = await this.$dal.getNextPage(this.paginator);
+      console.log(this.paginator);
     },
-    compareProducts(productsFromCsv, productsFromDB) {
-      const productsToUpdate = [];
-      const lastUpdate = new Date();
-
-      productsFromCsv.forEach((productCsv) => {
-        const productFromDB = productsFromDB.find(
-          (productFromDB) => productFromDB.id === productCsv.id
-        );
-        if (productFromDB) {
-          if (
-            productFromDB.lista !== productCsv.lista ||
-            productFromDB.producto !== productCsv.producto ||
-            productFromDB.familia !== productCsv.familia ||
-            productFromDB.subfamilia !== productCsv.subfamilia
-          ) {
-            productsToUpdate.push({ ...productCsv, lastUpdate });
-          }
-        } else {
-          productsToUpdate.push({ ...productCsv, lastUpdate });
-        }
-      });
-      return productsToUpdate;
-    },
-    compareCategories(categoriesFromCsv, categoriesFromDB) {
-      const categoriesToUpdate = [];
-      const lastUpdate = new Date();
-      categoriesFromCsv.forEach((categoryCsv) => {
-        const categoryFromDB = categoriesFromDB.find(
-          (categoryFromDB) => categoryFromDB.id === categoryCsv.id
-        );
-
-        if (categoryFromDB) {
-          if (categoryFromDB.name !== categoryCsv.name) {
-            categoriesToUpdate.push({ ...categoryCsv, lastUpdate });
-          }
-        } else {
-          categoriesToUpdate.push({ ...categoryCsv, lastUpdate });
-        }
-      });
-      return categoriesToUpdate;
-    },
-    compareSubcategories(subcategoriesFromCsv, subcategoriesFromDB) {
-      const subcategoriesToUpdate = [];
-      const lastUpdate = new Date();
-      subcategoriesFromCsv.forEach((subcategoryCsv) => {
-        const subcategoryFromDB = subcategoriesFromDB.find(
-          (subcategoryFromDB) => subcategoryFromDB.id === subcategoryCsv.id
-        );
-        if (subcategoryFromDB) {
-          if (
-            subcategoryFromDB.name !== subcategoryCsv.name ||
-            subcategoryFromDB.categoryId !== subcategoryCsv.categoryId
-          ) {
-            subcategoriesToUpdate.push({ ...subcategoryCsv, lastUpdate });
-          }
-        } else {
-          subcategoriesToUpdate.push({ ...subcategoryCsv, lastUpdate });
-        }
-      });
-      return subcategoriesToUpdate;
-    },
-    async loadDBAsync() {
-      const productsFromDB = await this.$dal.getAll('products');
-      const categoriesFromDB = await this.$dal.getAll('categories');
-      const subcategoriesFromDB = await this.$dal.getAll('subcategories');
-      return { productsFromDB, categoriesFromDB, subcategoriesFromDB };
-    },
-    async loadCsvAsync(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsText(file);
-        reader.onload = () => {
-          const resultCsv = this.loadCsv(reader);
-          resolve(resultCsv);
-        };
-      });
-    },
-    loadCsv(reader) {
-      const productsFromCsv = [];
-      const categoriesFromCsv = [];
-      const subcategoriesFromCsv = [];
-      const csv = reader.result;
-      const lines = csv.split('\r\n');
-      const headers = lines[7]
-        .toLowerCase()
-        .split(';')
-        .filter((item) => item);
-
-      const cat = new Set();
-      const subcat = new Set();
-      for (let i = 8; i < lines.length; i++) {
-        const obj = {};
-        const currentline = lines[i].split(';');
-        if (!currentline[0]) continue;
-
-        for (let j = 0; j < headers.length; j++) {
-          if (headers[j] && currentline[j]) {
-            obj[j === 0 ? 'id' : headers[j].trim()] = currentline[j]
-              ? currentline[j].trim()
-              : '';
-          }
-        }
-
-        const product = {};
-
-        for (const p in obj) {
-          if (obj[p]) {
-            product[p] = obj[p];
-          }
-        }
-
-        if (product.lista) {
-          const precio = Number(
-            product.lista.replace('$', '').replace(',', '.').trim()
-          );
-          product.lista = precio;
-        }
-
-        if (product.familia) {
-          cat.add(product.familia);
-          product.familia = product.familia.toLowerCase();
-        }
-        if (product.familia && product.subfamilia) {
-          subcat.add(product.familia + '-' + product.subfamilia);
-          product.subfamilia = product.subfamilia.toLowerCase();
-        }
-
-        productsFromCsv.push(product);
-      }
-      cat.forEach((item) => {
-        categoriesFromCsv.push({
-          name: item,
-          id: item.toLowerCase().replaceAll(' ', '-'),
-        });
-      });
-      subcat.forEach((item) => {
-        const [familia, subfamilia] = item.split('-');
-        subcategoriesFromCsv.push({
-          name: subfamilia,
-          id: item.toLowerCase().replaceAll('/', '-'),
-          category: familia.toLowerCase().replaceAll(' ', '-'),
-        });
-      });
-
-      return { productsFromCsv, categoriesFromCsv, subcategoriesFromCsv };
-    },
-
     loadFile(e) {
       const reader = new FileReader();
       const file = e.target.files[0]; // get the supplied file

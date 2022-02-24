@@ -12,14 +12,20 @@
           :options="{
             threshold: 0.5,
           }"
-          min-height="200"
+          min-height="96"
           transition="fade-transition"
         >
           <v-sheet
+            elevation="18"
+            class="d-flex flex-column justify-center align-center rounded-xl"
             @click="goTo('/category/' + item.id)"
-            class="d-flex flex-column justify-center align-center"
           >
-            <v-img :src="item.picture" class="mx-auto rounded-circle"></v-img>
+            <v-img
+              :src="item.picture"
+              class="mx-auto rounded-circle"
+              max-width="96"
+              max-height="96"
+            ></v-img>
             <span class="text-center">{{ item.name }}</span>
           </v-sheet>
         </v-lazy>
@@ -75,21 +81,14 @@ export default {
   },
   methods: {
     async loadCategories() {
-      // const categoriesLocal = await this.$storegetters('getCategories');
-      // if (categoriesLocal.length > 0) {
-      //   this.categories = categoriesLocal;
-      // } else {
-      //   const categories = await this.$dal.getAll('categories');
-      //   this.categories = categories;
-      //   this.$store.commit('setCategories', categories);
-      // }
-
       const res = await this.$dal.getAll('categories');
       const res2 = res.map((r) => {
         return {
           id: r.id,
           name: r.name,
-          picture: r.picture || 'https://firebasestorage.googleapis.com/v0/b/esb-web.appspot.com/o/fotos%2fina.png?alt=media',
+          picture:
+            r.picture ||
+            'https://firebasestorage.googleapis.com/v0/b/esb-web.appspot.com/o/fotos%2fina.png?alt=media',
         };
       });
       this.categories = res2;
@@ -101,5 +100,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>

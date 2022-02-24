@@ -41,7 +41,9 @@ export default {
     }),
   },
   methods: {
+    // TODO: validar si hay pedido
     // TODO: IR A PEDIDO CONFIRMADO LUEGO DE CONFIRMAR
+    // mostrar alert indicando que se confirmo el pedido
     confirmarPedido() {
       this.$dal.save('pedidos', {
         id: this.entregaId + '-' + this.$store.state.user.user.email,

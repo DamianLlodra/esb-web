@@ -1,8 +1,12 @@
 <template>
   <form class="p-2">
     <div v-for="field in getFields" :key="field.name">
-      <div v-if="field.inputType === 'select'"></div>
-      <div v-else-if="field.inputType === 'option'"></div>
+      <div v-if="field.inputType === 'select'">
+
+      </div>
+      <div v-else-if="field.inputType === 'option'">
+         
+      </div>
       <div v-else-if="field.inputType === 'currency'"></div>
       <div v-else-if="field.inputType === 'checkbox'">
         <div class="flex flex-row items-center m-2">
@@ -19,14 +23,15 @@
       <div v-else>
         <div class="flex flex-row m-2 justify-center">
           <div class="flex flex-col">
-            <label :for="field.name">{{ field.label }}</label>
-            <input
+            
+            <v-text-field
+              :label="field.label"
               :id="field.name"
               v-model="model[field.name]"
               :type="field.inputType"
               :placeholder="field.placeholder || field.label"
-              class="border-2 border-green-300 focus:border-green-500"
-            />
+            >
+            </v-text-field>
           </div>
         </div>
       </div>
@@ -124,7 +129,7 @@ export default {
 
       Object.entries(this.viewConfig).forEach((element) => {
         if (!this.model[element[0]])
-          this.model[element[0]] =  element[1].defaultValue;
+          this.model[element[0]] = element[1].defaultValue;
       });
 
       return dataProp;

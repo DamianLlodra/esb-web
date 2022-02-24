@@ -7,7 +7,8 @@
 
     <v-card-title class="d-flex justify-center">
       <v-spacer></v-spacer>
-      <div>$ {{ product.price }}</div>
+      <div v-if="product.price">$ {{ product.price }}</div>
+      <div v-else>SIN PRECIO</div>
       <v-spacer></v-spacer>
     </v-card-title>
 
@@ -16,7 +17,7 @@
     <v-card-text class="d-flex justify-center">
       <v-chip-group>
         <v-chip
-          v-if="!product.amount"
+          v-if="!product.amount && product.price"
           class="green ml-2"
           @click="changeAmount(1)"
           >Agregar al Pedido</v-chip
@@ -40,7 +41,7 @@
         >Total Comprado: ${{ totalComprado }}</span
       >
     </v-card-title> -->
-    <v-bottom-navigation v-if="cart.length > 0">
+    <v-bottom-navigation fixed app v-if="cart.length > 0">
       <v-btn @click="goTo('/category')">
         <span>Seguir Comprando</span>
         <v-icon>mdi-cart</v-icon>

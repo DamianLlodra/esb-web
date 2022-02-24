@@ -44,6 +44,13 @@ export default {
     }),
   },
   created() {
+    // const lastForceUpdate = await this.$dal.getById('config', 'lastForceUpdate');
+    // if (lastForceUpdate) {
+    //   this.$dal.update('config', {
+    //     lastForceUpdate: new Date(),
+    //   });
+    // }
+    
     data.updateLocalCatalog(this);
   },
   mounted() {

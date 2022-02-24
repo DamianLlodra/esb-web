@@ -5,21 +5,28 @@
         v-for="item in subcategories"
         :key="item.id"
         class="d-flex child-flex"
-        :cols="12 / itemsPerRow"
+        :cols="12"
       >
         <v-lazy
           v-model="isActive"
           :options="{
             threshold: 0.5,
           }"
-          min-height="200"
           transition="fade-transition"
         >
           <v-sheet
-            @click="goTo('/category/' + category + '/' + item.id)"
+            min-height="40"
+            elevation="6"
             class="d-flex flex-column justify-center align-center"
+            @click="goTo('/category/' + category + '/' + item.id)"
           >
-            <v-img :src="item.picture" class="mx-auto rounded-circle"></v-img>
+            <!--         <v-img
+              v-if="item.picture"
+              max-width="96"
+              max-height="96"
+              :src="item.picture"
+              class="mx-auto rounded-circle"
+            ></v-img> -->
             <span class="text-center">{{ item.name }}</span>
           </v-sheet>
         </v-lazy>
@@ -80,17 +87,13 @@ export default {
       const res = await this.$dal.getSubcategoriesByCategory(
         this.$route.params.idcategory
       );
-      
       const res2 = res.map((r) => {
         return {
           id: r.id,
           name: r.name,
-          picture:
-            r.picture ||
-            'https://firebasestorage.googleapis.com/v0/b/esb-web.appspot.com/o/fotos%2fina.png?alt=media',
+          picture: r.picture,
         };
       });
-      console.table(res2);
       this.subcategories = res2;
     },
     goTo(url) {
@@ -100,5 +103,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>
