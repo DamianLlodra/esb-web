@@ -1,18 +1,49 @@
 <template>
   <v-card>
-    <v-img height="200px" contain :src="product.picture"></v-img>
+    <v-img
+      height="150px"
+      contain
+      :src="product.errorPicure ? nopicture : product.picture"
+    ></v-img>
     <v-card-title class="d-flex justify-center">{{
       product.name
     }}</v-card-title>
 
-    <v-card-title class="d-flex justify-center">
-      <v-spacer></v-spacer>
-      <div v-if="product.price">$ {{ product.price }}</div>
-      <div v-else>SIN PRECIO</div>
-      <v-spacer></v-spacer>
-    </v-card-title>
+    <div class="d-flex justify-center mt-0">
+      <p class="text-subtitle-1 mb-0 font-weight-bold">
+        <span :class="textPrecio">$ {{ product.price }}</span>
+      </p>
+    </div>
+    <div class="d-flex justify-center">
+      <p class="text-caption mt-0 mb-1">Precio de lista final</p>
+    </div>
+    <v-spacer> </v-spacer>
 
-    <v-divider class="mx-2"></v-divider>
+    <v-sheet elevation="30" class="mt-1 align-center rounded-xl">
+      <div class="d-flex justify-center mt-0" elevation="21">
+        <p class="text-subtitle-1 mb-0 font-weight-bold">
+          <span :class="textPrecio1">$ {{ product.price1 }}</span>
+        </p>
+      </div>
+
+      <div class="d-flex justify-center mt-0">
+        <p class="text-caption mt-0 mb-1">
+          Precio oferta comprando mas de ${{ param.minimoPrecio1 }}
+        </p>
+      </div>
+    </v-sheet>
+    <v-spacer> </v-spacer>
+
+    <div class="d-flex justify-center mt-0">
+      <p class="text-subtitle-1 mb-0 font-weight-bold">
+        <span :class="textPrecio2">$ {{ product.price2 }} </span>
+      </p>
+    </div>
+    <div class="d-flex justify-center mt-0">
+      <p class="text-caption mt-0 mb-1">
+        Precio oferta comprando mas de ${{ param.minimoPrecio2 }}
+      </p>
+    </div>
 
     <v-card-text class="d-flex justify-center">
       <v-chip-group>
@@ -25,22 +56,22 @@
         <v-chip v-if="product.amount" class="red ml-2" @click="changeAmount(-1)"
           ><v-icon>mdi-minus</v-icon></v-chip
         >
-        <v-chip v-if="product.amount"> {{ product.amount }}</v-chip>
+        <v-chip v-if="product.amount">
+          <input
+            :value="product.amount"
+            style="text-align: center"
+            @change="changeAmount($event.target.value)"
+          />
+        </v-chip>
         <v-chip v-if="product.amount" class="green" @click="changeAmount(1)"
           ><v-icon>mdi-plus</v-icon></v-chip
         >
       </v-chip-group>
     </v-card-text>
     <v-card-title class="d-flex justify-center">
-      <span v-if="product.amount" class="mx-2"
-        >Importe: ${{ totalItemRounded }}</span
-      >
+      <span v-if="product.amount">Importe: ${{ totalItemRounded }}</span>
     </v-card-title>
-    <!-- <v-card-title class="d-flex justify-center">
-      <span v-if="product.amount" class="mx-2"
-        >Total Comprado: ${{ totalComprado }}</span
-      >
-    </v-card-title> -->
+
     <v-bottom-navigation fixed app v-if="cart.length > 0">
       <v-btn @click="goTo('/category')">
         <span>Seguir Comprando</span>
@@ -64,6 +95,8 @@ export default {
       productid: '',
       subcategoryid: '',
       product: {},
+      nopicture:
+        'https://firebasestorage.googleapis.com/v0/b/esb-web.appspot.com/o/fotos%2fina.png?alt=media',
     };
   },
   computed: {
@@ -72,9 +105,32 @@ export default {
     }),
     ...mapGetters({
       totalComprado: 'cart/totalComprado',
+      param: 'cart/getParam',
     }),
     totalItemRounded() {
-      return this.roundToTwo(this.product.amount * this.product.price);
+      const { current } = this.totalComprado;
+      let price = this.product.price;
+      if (current === 'totalPrecio1') price = this.product.price1;
+      if (current === 'totalPrecio2') price = this.product.price2;
+
+      return this.roundToTwo(this.product.amount * price);
+    },
+    textPrecio() {
+      const { current } = this.totalComprado;
+      if (current === 'totalLista') return '';
+      else return 'text--secondary text-decoration-line-through';
+    },
+    textPrecio1() {
+      const { current } = this.totalComprado;
+      if (current === 'totalPrecio1') return '';
+      else if (current === 'totalPrecio2')
+        return 'text--secondary text-decoration-line-through';
+      else return 'text--secondary';
+    },
+    textPrecio2() {
+      const { current } = this.totalComprado;
+      if (current === 'totalPrecio2') return '';
+      else return 'text--secondary';
     },
   },
   created() {
@@ -82,6 +138,7 @@ export default {
     this.subcategoryid = this.$route.params.idsubcategory;
     this.loadCart();
     this.load();
+    this.loadParam();
   },
   methods: {
     loadCart() {
@@ -89,6 +146,13 @@ export default {
       if (lsCart) {
         const cart = JSON.parse(lsCart);
         this.$store.commit('cart/load', cart);
+      }
+    },
+    loadParam() {
+      const lsParam = localStorage.getItem('param');
+      if (lsParam) {
+        const param = JSON.parse(lsParam);
+        this.$store.commit('cart/setParam', param);
       }
     },
     load() {
@@ -100,10 +164,15 @@ export default {
             id: r.id,
             name: r.producto,
             price: r.lista,
+            price1: r.precio1,
+            price2: r.precio2,
             amount: 0,
+            errorPicure: false,
             picture:
               r.picture ||
-              'https://firebasestorage.googleapis.com/v0/b/esb-web.appspot.com/o/fotos%2fina.png?alt=media',
+              'https://firebasestorage.googleapis.com/v0/b/esb-web.appspot.com/o/fotos%2f' +
+                r.id +
+                '.PNG?alt=media',
           };
         });
       const productInCart = this.cart.filter(
@@ -114,7 +183,11 @@ export default {
       this.product.amount = productInCart ? productInCart.amount : 0;
     },
     changeAmount(amount) {
-      this.product.amount += amount;
+      if (typeof amount === 'string') {
+        this.product.amount = parseInt(amount);
+      } else {
+        this.product.amount += amount;
+      }
       this.addOrder(this.product.amount, { ...this.product });
     },
     addOrder(amount, item) {

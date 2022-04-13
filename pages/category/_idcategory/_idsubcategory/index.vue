@@ -41,11 +41,12 @@
             class="d-flex flex-column justify-center align-center"
           >
             <v-img
+              class="mx-auto rounded-circle"
+              contain
               max-width="96"
               max-height="96"
               :src="item.errorPicure ? nopicture : item.picture"
               @error="item.errorPicure = true"
-              class="mx-auto rounded-circle"
             ></v-img>
             <span class="text-center">{{ item.name }}</span>
             <span class="text-center">${{ item.precio }}</span>
@@ -126,7 +127,7 @@ export default {
           errorPicure: false,
           picture:
             r.picture ||
-            linkpicture + r.producto.replaceAll(' ', '_') + '.PNG?alt=media',
+            linkpicture + r.id + '.PNG?alt=media',
         };
       });
     },

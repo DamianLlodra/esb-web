@@ -145,8 +145,14 @@ export default {
           (productFromDB) => productFromDB.id === productCsv.id
         );
         if (productFromDB) {
+          if (productFromDB.imagenFrom)
+            productCsv.imageFrom = productFromDB.imagenFrom;
+          else productCsv.imageFrom = '';
+
           if (
             productFromDB.lista !== productCsv.lista ||
+            productFromDB.precio1 !== productCsv.precio1 ||
+            productFromDB.precio2 !== productCsv.precio2 ||
             productFromDB.producto !== productCsv.producto ||
             productFromDB.familia !== productCsv.familia ||
             productFromDB.subfamilia !== productCsv.subfamilia
@@ -258,13 +264,29 @@ export default {
           }
         }
 
-        if (product.lista && this.actualizarPrecios) {
-          const precio = Number(
-            product.lista.replace('$', '').replace(',', '.').trim()
-          );
-          product.lista = precio;
+        if (this.actualizarPrecios) {
+          if (product.lista) {
+            product.lista = Number(
+              product.lista.replace('$', '').replace(',', '.').trim()
+            );
+          } else {
+            product.lista = 0;
+          }
+          if (product.precio1) {
+            product.precio1 = Number(
+              product.precio1.replace('$', '').replace(',', '.').trim()
+            );
+          } else {
+            product.precio1 = 0;
+          }
+          if (product.precio2) {
+            product.precio2 = Number(
+              product.precio2.replace('$', '').replace(',', '.').trim()
+            );
+          } else {
+            product.precio2 = 0;
+          }
         }
-
         if (this.actualizarCategorias) {
           if (product.familia) {
             product.familia = product.familia.replaceAll('/', '-');

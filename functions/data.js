@@ -24,21 +24,25 @@ export default {
     let productsFromDb = [];
     let subcategoriesFromDb = [];
     const updcat = this.updateSubCategory;
-    // console.log("productsLocal " + productsLocal.length);
     if (lastDownload && productsLocal.length > 0) {
       const lastDownloadDate = new Date(lastDownload);
       productsFromDb = await that.$dal.getLastUpdateProducts(lastDownloadDate);
+      console.table(productsFromDb);
       productsFromDb.forEach((productDB) => {
+
         const productLocal = productsLocal.find(
           (productLocal) => productDB.id === productLocal.id
         );
         if (productLocal) {
-          const { id, producto, familia, subfamilia, lista } = productDB;
+          const { id, producto, familia, subfamilia, lista, precio1, precio2 } =
+            productDB;
           productLocal.id = id;
           productLocal.producto = producto;
           productLocal.familia = familia;
           productLocal.subfamilia = subfamilia;
           productLocal.lista = lista;
+          productLocal.precio1 = precio1;
+          productLocal.precio2 = precio2;
         }
       });
       // console.log("products save " + productsLocal.length);

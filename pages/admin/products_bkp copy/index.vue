@@ -55,7 +55,6 @@
                     <div class="flex flex-row m-2 justify-center">
                       <div class="flex flex-col">
                         <v-file-input
-                          id="inputFile"
                           label="Imagen"
                           accept="image/PNG"
                           prepend-icon="mdi-camera"
@@ -136,10 +135,9 @@ export default {
           inputType: 'select',
           options: [],
           itemText: 'name',
-          itemValue: 'id', 
+          itemValue: 'id',
           label: 'Familia',
           required: true,
-          defaultValue: '',
         },
         subfamilia: {
           inputType: 'select',
@@ -167,12 +165,6 @@ export default {
           label: 'Precio 2',
           required: true,
           defaultValue: 0,
-        },
-        imagenFrom: {
-          inputType: 'text',
-          label: 'Tomar imagen desde otro Articulo:',
-          required: true,
-          defaultValue: '',
         },
         /* imagen: {
           inputType: 'file',
@@ -222,13 +214,14 @@ export default {
       },
       deep: true,
     },
-    'selectedProduct.familia': function (newFamilia, oldFamilia) {
-      
-      if (this.selectedProduct.familia) {
-         this.getSubcategories();
-      }
+    'selectedProduct.familia': {
+      handler() {
+        if (this.selectedProduct.familia) {
+          this.getSubcategories();
+        }
+      },
+      deep: true,
     },
-    
   },
   async created() {
     await this.initialize();
@@ -236,10 +229,10 @@ export default {
   methods: {
     getItems() {},
     async previousPage() {
-      this.paginator = await this.$dal.getPage(this.paginator, 'previous');
+      this.paginator = await this.$dal.getPreviousPage(this.paginator);
     },
     async nextPage() {
-      this.paginator = await this.$dal.getPage(this.paginator, 'next');
+      this.paginator = await this.$dal.getNextPage(this.paginator);
     },
     async initialize() {
       this.paginator = await this.$dal.getPaginator(
@@ -247,7 +240,7 @@ export default {
         'id',
         this.itemsPerPage
       );
-      this.paginator = await this.$dal.getPage(this.paginator);
+      this.paginator = await this.$dal.getFirstPage(this.paginator);
       this.viewConfig.familia.options = await this.$dal.getAll('categories');
       this.subcategories = await this.$dal.getAll('subcategories');
     },
@@ -260,7 +253,7 @@ export default {
         '>=',
         this.searchValue
       );
-      this.paginator = await this.$dal.getPage(this.paginator);
+      this.paginator = await this.$dal.getFirstPage(this.paginator);
     },
     getSubcategories() {
       this.viewConfig.subfamilia.options = this.subcategories.filter(
@@ -278,48 +271,25 @@ export default {
       this.dialogDelete = false;
     },
     editItem(item) {
-      if (!item.imagenFrom) this.$set(item, 'imagenFrom', '');
-      if (!item.familia) this.$set(item, 'familia', '');
-      if (!item.subfamilia) this.$set(item, 'subfamilia', '');
-
       this.selectedProduct = item;
       this.getSubcategories();
       this.dialog = true;
     },
     deleteItemConfirm() {
       this.loading = true;
-      this.$dal
-        .delete('products', this.selectedProduct.id)
-        .then(() => {
-          this.loading = false;
-          this.dialogDelete = false;
-          this.paginator = this.$dal.getPage(this.paginator);
-          this.$alertify.success('Producto eliminado');
-        })
-        .catch(() => {
-          this.loading = false;
-          this.$alertify.error('Error al eliminar el producto');
-        });
-
-      this.loading = false;
+      this.$dal.delete('products', this.selectedProduct.id).then(() => {
+        this.loading = false;
+        this.dialogDelete = false;
+        this.paginator = this.$dal.getFirstPage(this.paginator);
+      });
     },
     save() {
       this.loading = true;
-      this.$dal
-        .save('products', this.selectedProduct)
-        .then(() => {
-          this.loading = false;
-          this.dialog = false;
-          this.$alertify.success('Los datos fueron guardados correctamente');
-        })
-        .catch((error) => {
-          console.log(error);
-
-          this.loading = false;
-          this.$alertify.error('Hubo un error al guardar los datos');
-        });
-
-      this.loading = false;
+      this.$dal.save('products', this.selectedProduct).then(() => {
+        this.loading = false;
+        this.dialog = false;
+        this.paginator = this.$dal.getFirstPage(this.paginator);
+      });
     },
     New() {
       this.$router.push('/admin/products/new');
@@ -347,7 +317,6 @@ export default {
 
         imageRef.put(image).then(() => {
           this.$alertify.success('Imagen subida correctamente');
-          this.$ref.inputFile.value = '';
         });
       } else {
         this.$alertify.error('Please upload an image first.');

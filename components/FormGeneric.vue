@@ -1,35 +1,70 @@
 <template>
-  <form class="p-2">
+  <form class="p-1">
     <div v-for="field in getFields" :key="field.name">
-      <div v-if="field.inputType === 'select'">
-
-      </div>
-      <div v-else-if="field.inputType === 'option'">
-         
-      </div>
-      <div v-else-if="field.inputType === 'currency'"></div>
-      <div v-else-if="field.inputType === 'checkbox'">
-        <div class="flex flex-row items-center m-2">
-          <input
-            :id="field.name"
-            v-model="model[field.name]"
-            :type="field.inputType"
-            :placeholder="field.placeholder || field.label"
-            class="border-2 border-blue-300 focus:border-blue-500"
-          />
-          <label class="ml-1" :for="field.name">{{ field.label }}</label>
-        </div>
-      </div>
-      <div v-else>
-        <div class="flex flex-row m-2 justify-center">
-          <div class="flex flex-col">
-            
+      <div class="flex flex-row m-2 justify-center">
+        <div class="flex flex-col">
+          <div v-if="field.inputType === 'select'">
+            <v-select
+              :label="field.label"
+              :id="field.name"
+              v-model="model[field.name]"
+              :type="field.inputType"
+              :placeholder="field.placeholder || field.label"
+              :prefix="field.prefix"
+              :suffix="field.suffix"
+              :items="field.options"
+              item-text="name"
+              item-value="id"
+            >
+            </v-select>
+          </div>
+          <div v-else-if="field.inputType === 'option'"></div>
+          <div v-else-if="field.inputType === 'currency'"></div>
+          <div v-else-if="field.inputType === 'file'">
+            <v-file-input
+              :label="field.label"
+              :id="field.name"
+              v-model="model[field.name]"
+              key=""
+              type="file"
+              :placeholder="field.placeholder || field.label"
+              :prefix="field.prefix"
+              :suffix="field.suffix"
+            ></v-file-input>
+          </div>
+          <div v-else-if="field.inputType === 'checkbox'">
+            <div class="flex flex-row items-center m-2">
+              <input
+                :id="field.name"
+                v-model="model[field.name]"
+                :type="field.inputType"
+                :placeholder="field.placeholder || field.label"
+                class="border-2 border-blue-300 focus:border-blue-500"
+              />
+              <label class="ml-1" :for="field.name">{{ field.label }}</label>
+            </div>
+          </div>
+          <div v-else-if="field.inputType === 'number'">
+            <v-text-field
+              :label="field.label"
+              :id="field.name"
+              v-model.number="model[field.name]"
+              :type="field.inputType"
+              :placeholder="field.placeholder || field.label"
+              :prefix="field.prefix"
+              :suffix="field.suffix"
+            >
+            </v-text-field>
+          </div>
+          <div v-else>
             <v-text-field
               :label="field.label"
               :id="field.name"
               v-model="model[field.name]"
               :type="field.inputType"
               :placeholder="field.placeholder || field.label"
+              :prefix="field.prefix"
+              :suffix="field.suffix"
             >
             </v-text-field>
           </div>
@@ -123,6 +158,11 @@ export default {
                 : this.viewConfig[key].defaultValue,
             validations: this.viewConfig[key].validations,
             items: this.viewConfig[key].items || [],
+            suffix: this.viewConfig[key].suffix,
+            prefix: this.viewConfig[key].prefix,
+            options: this.viewConfig[key].options,
+            itemsText: this.viewConfig[key].itemsText,
+            itemsValue: this.viewConfig[key].itemsValue,
           });
         }
       }

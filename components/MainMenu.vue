@@ -50,6 +50,12 @@ export default {
       adminItems: [
         { title: 'Administracion' },
         {
+          title: 'Configuracion y parametros',
+          icon: 'mdi-cog',
+          path: '/admin/params',
+        },
+
+        {
           title: 'Usuarios',
           icon: 'mdi-account-multiple',
           path: '/admin/users',

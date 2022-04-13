@@ -26,4 +26,8 @@ export default {
     state.cart = [];
     localStorage.setItem('cart', JSON.stringify(state.cart));
   },
+  setParam(state, paramFromDb) {
+    state.param = paramFromDb;
+    localStorage.setItem('param', JSON.stringify(state.param));
+  },
 };

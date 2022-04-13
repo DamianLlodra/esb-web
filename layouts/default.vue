@@ -11,7 +11,7 @@
       <v-divider class="mx-2" inset vertical></v-divider>
 
       <div @click="goTo('/checkout')">
-        <v-icon>mdi-cart</v-icon>${{ totalComprado }}
+        <v-icon>mdi-cart</v-icon>${{ getTotal }}
       </div>
     </v-app-bar>
 
@@ -42,6 +42,11 @@ export default {
     ...mapGetters({
       totalComprado: 'cart/totalComprado',
     }),
+    getTotal() {
+      const total = this.totalComprado;
+      console.log(total);
+      return total[total.current];
+    },
   },
   created() {
     // const lastForceUpdate = await this.$dal.getById('config', 'lastForceUpdate');
@@ -50,14 +55,19 @@ export default {
     //     lastForceUpdate: new Date(),
     //   });
     // }
-    
     data.updateLocalCatalog(this);
   },
-  mounted() {
+  async mounted() {
     const lsCart = localStorage.getItem('cart');
     if (lsCart) {
       const cart = JSON.parse(lsCart);
       this.$store.commit('cart/load', cart);
+    }
+
+    const param = await this.$dal.getById('params', '1');
+
+    if (param) {
+      this.$store.commit('cart/setParam', param);
     }
   },
   methods: {
