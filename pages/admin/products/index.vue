@@ -136,7 +136,7 @@ export default {
           inputType: 'select',
           options: [],
           itemText: 'name',
-          itemValue: 'id', 
+          itemValue: 'id',
           label: 'Familia',
           required: true,
           defaultValue: '',
@@ -223,12 +223,10 @@ export default {
       deep: true,
     },
     'selectedProduct.familia': function (newFamilia, oldFamilia) {
-      
       if (this.selectedProduct.familia) {
-         this.getSubcategories();
+        this.getSubcategories();
       }
     },
-    
   },
   async created() {
     await this.initialize();
@@ -256,9 +254,13 @@ export default {
         'products',
         'id',
         this.itemsPerPage,
-        this.searchIn.value,
-        '>=',
-        this.searchValue
+        this.searchIn.value === 'producto'
+          ? 'nombreProducto'
+          : this.searchIn.value,
+        this.searchIn.value === 'producto' ? 'array-contains' : '>=',
+        this.searchIn.value === 'producto'
+          ? this.searchValue.toLowerCase()
+          : this.searchValue
       );
       this.paginator = await this.$dal.getPage(this.paginator);
     },
@@ -304,6 +306,15 @@ export default {
       this.loading = false;
     },
     save() {
+      const nombreProducto = this.selectedProduct.producto
+        .toLowerCase()
+        .split('');
+      if (this.selectedProduct.nombreProducto) {
+        this.selectedProduct.nombreProducto = nombreProducto;
+      } else {
+        this.$set(this.selectedProduct, 'nombreProducto', nombreProducto);
+      }
+
       this.loading = true;
       this.$dal
         .save('products', this.selectedProduct)

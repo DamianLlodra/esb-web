@@ -2,7 +2,7 @@
   <v-card>
     <v-card-title> Confirmar Pedido </v-card-title>
     <v-card-text class="text-h6"
-      >Total a pagar: $ {{ totalComprado }}</v-card-text
+      >Total a pagar: $ {{ totalComprado[totalComprado.current] }}</v-card-text
     >
     <v-card-text class="text-h6">Fecha de entrega: {{ entrega }}</v-card-text>
     <v-card-text class="text-h6"

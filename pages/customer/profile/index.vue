@@ -9,7 +9,6 @@
 </template>
 
 <script>
-
 export default {
   asyncData() {
     return {
@@ -42,7 +41,7 @@ export default {
   },
   methods: {
     save() {
-      this.$dal.save('customer', this.data).then(() => {        
+      this.$dal.save('customer', this.data).then(() => {
         this.$store.commit('user/setUser', this.data);
         this.$router.push('/');
       });

@@ -2,15 +2,15 @@ export default {
   totalComprado: ({ cart, param }) => {
     if (cart) {
       const totalLista = cart.reduce(
-        (total, item) => (total + item.price) * item.amount,
+        (total, item) => total + item.price * item.amount,
         0
       );
       const totalPrecio1 = cart.reduce(
-        (total, item) => (total + item.price1 || 0) * item.amount,
+        (total, item) => total + (item.price1 || item.price) * item.amount,
         0
       );
       const totalPrecio2 = cart.reduce(
-        (total, item) => (total + item.price2 || 0) * item.amount,
+        (total, item) => total + (item.price2 || item.price) * item.amount,
         0
       );
       const total = {

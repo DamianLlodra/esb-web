@@ -51,6 +51,6 @@ export default {
   build: {},
 
   router: {
-    middleware: 'router-auth',
+    middleware: ['router-auth'],
   },
 };

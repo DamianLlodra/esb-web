@@ -4,13 +4,16 @@
       <main-menu></main-menu>
     </v-navigation-drawer>
     <v-app-bar app color="#4CAF50">
-      <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon
+        v-if="loged"
+        @click="drawer = true"
+      ></v-app-bar-nav-icon>
       <v-divider class="mx-2" inset vertical></v-divider>
       <v-toolbar-title>ESB </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-divider class="mx-2" inset vertical></v-divider>
 
-      <div @click="goTo('/checkout')">
+      <div v-if="loged" @click="goTo('/checkout')">
         <v-icon>mdi-cart</v-icon>${{ getTotal }}
       </div>
     </v-app-bar>
@@ -25,7 +28,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import MainMenu from '../components/MainMenu.vue';
 import data from '../functions/data.js';
 
@@ -39,6 +42,9 @@ export default {
     contador: 0,
   }),
   computed: {
+    ...mapState({
+      loged: (state) => state.user.user.email,
+    }),
     ...mapGetters({
       totalComprado: 'cart/totalComprado',
     }),

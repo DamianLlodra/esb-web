@@ -1,7 +1,11 @@
 <template>
   <div class="flex p-2 bg-white bg-opacity-100 shadow-g">
     <div class="md:flex-shrink-0">
-      <img class="w-20 h-20 scale-0 rounded-md" :src="image" />
+      <img 
+        class="w-20 h-20 scale-0 rounded-md"
+        :src="errorPicture ? noPicture : image"
+        @error="errorPicture = true"
+      />
     </div>
     <div class="flex flex-col ml-2">
       <p class="font-semibold">{{ title }}</p>
@@ -29,13 +33,14 @@
 export default {
   props: {
     image: { type: String, default: () => '' },
+    noPicture: { type: String, default: () => '' },
     title: { type: String, default: () => '' },
     subtitle: { type: String, default: () => '' },
     price: { type: Number, default: () => 0 },
     amount: { type: Number, default: () => 0 },
   },
   data() {
-    return { amountLocal: this.amount };
+    return { amountLocal: this.amount, errorPicture: false };
   },
   watch: {
     amount(newVal) {

@@ -263,7 +263,9 @@ export default {
             }
           }
         }
-
+        if (product.producto) {
+          product.nombreProducto = product.producto.toLowerCase().split(' ');
+        }
         if (this.actualizarPrecios) {
           if (product.lista) {
             product.lista = Number(

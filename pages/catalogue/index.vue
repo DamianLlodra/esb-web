@@ -14,7 +14,7 @@
         <div class="justify-rigth">
           <div class="flex flex-col self-end font-semibold">
             <span class="text-xs"> Total: </span>
-            ${{ totalComprado }}
+            ${{ totalComprado[totalComprado.current] }}
           </div>
         </div>
       </v-toolbar>
@@ -32,16 +32,26 @@
         item-height="155"
       >
         <template v-slot:default="{ item, index }">
-          <item-catalogue
-            max-height="155"
-            :key="index"
-            :title="item.name"
-            :subtitle="'Precio: $' + item.price"
-            :image="item.image"
-            :price="item.price"
-            :amount="item.amount"
-            @changeAmount="addOrder($event, item)"
-          ></item-catalogue>
+          <v-lazy
+            v-model="isActive"
+            :options="{
+              threshold: 0.5,
+            }"
+            min-height="200"
+            transition="fade-transition"
+          >
+            <item-catalogue
+              max-height="155"
+              :key="index"
+              :title="item.name"
+              :subtitle="'Precio: $' + item.price"
+              :image="item.image"
+              :no-picture="noPicture"
+              :price="item.price"
+              :amount="item.amount"
+              @changeAmount="addOrder($event, item)"
+            ></item-catalogue>
+          </v-lazy>
         </template>
       </v-virtual-scroll>
     </v-card>
@@ -67,10 +77,18 @@ export default {
       selectedCategory: '',
       categories: [],
       search: '',
+      noPicture:
+        'https://firebasestorage.googleapis.com/v0/b/esb-web.appspot.com/o/fotos%2fina.png?alt=media',
     };
   },
   data() {
-    return { products: [], search: '', selectedCategory: '', categories: [] };
+    return {
+      products: [],
+      search: '',
+      selectedCategory: '',
+      categories: [],
+      isActive: false,
+    };
   },
 
   computed: {
@@ -164,12 +182,13 @@ export default {
     },
     loadLocalCatalog() {
       const productsLocal = JSON.parse(localStorage.getItem('products'));
-
+      const linkpicture =
+        'https://firebasestorage.googleapis.com/v0/b/esb-web.appspot.com/o/fotos%2F';
       this.products = productsLocal.map((p) => {
         return {
           name: p.producto,
           price: p.lista,
-          image: null,
+          image: p.picture || linkpicture + p.id + '.PNG?alt=media',
           category: p.familia,
           subcategory: p.subfamilia,
         };

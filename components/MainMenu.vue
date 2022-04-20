@@ -1,6 +1,13 @@
 <template>
   <div>
     <v-list-item>
+      <v-list-item-avatar>
+        <v-list-item-action>
+          <v-btn icon>
+            <v-icon>mdi-account-circle</v-icon>
+          </v-btn>
+        </v-list-item-action>
+      </v-list-item-avatar>
       <v-list-item-content>
         <v-list-item-title class="text-h6">
           {{ displayName }}
@@ -8,12 +15,19 @@
         <v-list-item-subtitle> {{ email }} </v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
-
+    <v-list-item>
+      <v-list-item-content>
+        <v-btn icon @click="logout">
+          <v-icon>mdi-logout</v-icon>
+          Salir
+        </v-btn>
+      </v-list-item-content>
+    </v-list-item>
     <v-divider></v-divider>
 
     <v-list dense nav v-if="loged">
       <v-list-item
-        v-for="(item, index) in items"
+        v-for="(item, index) in itemsMenu"
         :key="index"
         link
         @click="to(item.path)"
@@ -33,12 +47,13 @@
 </template>
 
 <script>
+import { mapState, mapSetter } from 'vuex';
 export default {
   data() {
     return {
-      loged: true,
-      displayName: '',
-      email: '',
+      // loged: true,
+      // displayName: '',
+      // email: '',
       items: [
         { title: 'Categorias', icon: 'mdi-folder-multiple', path: '/category' },
         { title: 'Productos', icon: 'mdi-shopping', path: '/catalogue' },
@@ -75,20 +90,24 @@ export default {
       ],
     };
   },
-  created() {
-    const { displayName, email, isAdmin } = this.$store.state.user.user;
-    this.displayName = displayName;
-    this.email = email;
-    if (isAdmin) {
-      this.items = this.items.concat(this.adminItems);
-    }
+  computed: {
+    ...mapState({
+      loged: (state) => !!state.user.user.email,
+      user: (state) => state.user.user,
+      displayName: (state) => state.user.user.displayName || '',
+      email: (state) => state.user.user.email || '',
+      isAdmin: (state) => state.user.user.isAdmin || false,
+    }),
+    itemsMenu() {
+      return this.isAdmin ? [...this.items, ...this.adminItems] : this.items;
+    },
   },
   methods: {
     to(path) {
       this.$router.push(path);
     },
     async logout() {
-      await this.$auth.logout();
+      await this.$store.commit('user/logout');
     },
   },
 };

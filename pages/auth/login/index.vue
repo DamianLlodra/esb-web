@@ -30,50 +30,32 @@ export default {
     };
   },
   methods: {
-    async login() {
-      this.error = null;
-      try {
-        await this.$auth.loginWith('local', {
-          data: {
-            identifier: this.email,
-            password: this.password,
-          },
-        });
-        this.$router.push('/catalogue');
-      } catch (e) {
-        this.error = e.response.data.message[0].messages[0].message;
-      }
-    },
     async googleLogin() {
       try {
-        await this.$firebase
+        const result = await this.$firebase
           .auth()
-          .signInWithPopup(new this.$firebase.auth.GoogleAuthProvider())
-          .then((result) => {
-            const { displayName, email } = result.user;
+          .signInWithPopup(new this.$firebase.auth.GoogleAuthProvider());
 
-            this.$dal.getById('users', email).then((user) => {
-              if (!user) {
-                this.$dal.save('users', {
-                  displayName,
-                  email,
-                  isAdmin: false,
-                  id: email,
-                });
-              }
-              this.$store.commit('user/setUser', {
-                displayName,
-                email,
-                isAdmin: user.isAdmin,
-              });
-            });
+        const { displayName, email } = result.user;
 
-            this.$router.push('/catalogue');
-          })
-          .catch((error) => {
-            console.log(error);
+        const user = await this.$dal.getById('users', email);
+        if (!user) {
+          await this.$dal.save('users', {
+            displayName,
+            email,
+            isAdmin: false,
+            id: email,
           });
+        }
+        this.$store.commit('user/setUser', {
+          displayName,
+          email,
+          isAdmin: user.isAdmin,
+        });
+
+        this.$router.push('/');
       } catch (e) {
+        console.log(e);
         this.error = e.response.data.message[0].messages[0].message;
       }
     },
