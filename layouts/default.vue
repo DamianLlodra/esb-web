@@ -9,10 +9,24 @@
         @click="drawer = true"
       ></v-app-bar-nav-icon>
       <v-divider class="mx-2" inset vertical></v-divider>
-      <v-toolbar-title>ESB </v-toolbar-title>
+
+      <v-toolbar-title>
+        <div @click="goTo('/')">
+          <v-img class="rounded-lg" width="36" src="/favicon-32x32.png"></v-img>
+        </div>
+      </v-toolbar-title>
+
       <v-spacer></v-spacer>
       <v-divider class="mx-2" inset vertical></v-divider>
-
+      <div color="white" v-if="loged" @click="goTo('/checkout')">
+        <v-progress-circular
+          :rotate="-90"
+          color="primary"
+          :value="percentPoints"
+          >{{ points }}</v-progress-circular
+        >
+      </div>
+      <v-divider class="mx-2" inset vertical></v-divider>
       <div v-if="loged" @click="goTo('/checkout')">
         <v-icon>mdi-cart</v-icon>${{ getTotal }}
       </div>
@@ -50,8 +64,13 @@ export default {
     }),
     getTotal() {
       const total = this.totalComprado;
-      console.log(total);
       return total[total.current];
+    },
+    percentPoints() {
+      return 50;
+    },
+    points() {
+      return 25;
     },
   },
   created() {

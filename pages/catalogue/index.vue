@@ -28,7 +28,7 @@
       <v-virtual-scroll
         bench="100"
         :items="filteredProducts"
-        height="400"
+        height="500"
         item-height="155"
       >
         <template v-slot:default="{ item, index }">
@@ -40,7 +40,9 @@
             min-height="200"
             transition="fade-transition"
           >
+          <div@click="goToItem(item)">
             <item-catalogue
+              
               max-height="155"
               :key="index"
               :title="item.name"
@@ -50,7 +52,7 @@
               :price="item.price"
               :amount="item.amount"
               @changeAmount="addOrder($event, item)"
-            ></item-catalogue>
+            ></item-catalogue></div>
           </v-lazy>
         </template>
       </v-virtual-scroll>
@@ -71,14 +73,13 @@ import itemCatalogue from '~/components/itemCatalogue.vue';
 
 export default {
   components: { itemCatalogue },
-  async asyncData() {
+  asyncData() {
     return {
       products: [],
       selectedCategory: '',
       categories: [],
       search: '',
-      noPicture:
-        'https://firebasestorage.googleapis.com/v0/b/esb-web.appspot.com/o/fotos%2fina.png?alt=media',
+     
     };
   },
   data() {
@@ -88,6 +89,8 @@ export default {
       selectedCategory: '',
       categories: [],
       isActive: false,
+       noPicture:
+        'https://firebasestorage.googleapis.com/v0/b/esb-web.appspot.com/o/fotos%2fina.png?alt=media',
     };
   },
 
@@ -107,7 +110,6 @@ export default {
       );
 
       if (productsFiltered.length > 0) {
-        console.log(this.cart);
         for (const item of this.cart) {
           const product = productsFiltered.find(
             (product) => product.name === item.name
@@ -182,13 +184,13 @@ export default {
     },
     loadLocalCatalog() {
       const productsLocal = JSON.parse(localStorage.getItem('products'));
-      const linkpicture =
-        'https://firebasestorage.googleapis.com/v0/b/esb-web.appspot.com/o/fotos%2F';
+     
       this.products = productsLocal.map((p) => {
         return {
+          id: p.id,
           name: p.producto,
           price: p.lista,
-          image: p.picture || linkpicture + p.id + '.PNG?alt=media',
+          image: this.getPathPicture(p.id, p.picture),
           category: p.familia,
           subcategory: p.subfamilia,
         };
@@ -201,6 +203,24 @@ export default {
     },
     goToCheckout() {
       this.$router.push({ name: 'checkout' });
+    },
+    goToItem(item) {
+      this.$router.push(
+        'category/' + item.category + '/' + item.category+'-'+item.subcategory + '/' + item.id
+      );
+    },
+    getPathPicture(id, picture) {
+      let filePiecture = picture;
+      if (!filePiecture) {
+        filePiecture = id + '.PNG';
+      }
+
+      const url =
+        'https://firebasestorage.googleapis.com/v0/b/esb-web.appspot.com/o/fotos%2f' +
+        filePiecture +
+        '?alt=media';
+
+      return url;
     },
   },
 };

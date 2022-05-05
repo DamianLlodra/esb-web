@@ -1,3 +1,5 @@
+import util from '../../functions/util.js';
+
 export default {
   totalComprado: ({ cart, param }) => {
     if (cart) {
@@ -14,10 +16,11 @@ export default {
         0
       );
       const total = {
-        totalLista,
-        totalPrecio1,
-        totalPrecio2,
+        totalLista: util.roundToTwo(totalLista),
+        totalPrecio1: util.roundToTwo(totalPrecio1),
+        totalPrecio2: util.roundToTwo(totalPrecio2),
         current: 'totalLista',
+        points: 0,
       };
       if (totalLista < param.minimoPrecio1) total.current = 'totalLista';
       else if (
@@ -25,7 +28,18 @@ export default {
         totalPrecio1 < param.minimoPrecio2
       )
         total.current = 'totalPrecio1';
-      else total.current = 'totalPrecio2';
+      else if (totalPrecio2 >= param.minimoPrecio2)
+        total.current = 'totalPrecio2';
+
+      const currentTotal = total[total.current];
+      if (param && param.puntos) {
+        const puntos = param.puntos.find(
+          (p) =>
+            p.importeDesde <= currentTotal && p.importeHasta >= currentTotal
+        );
+
+        total.points = puntos ? puntos.puntos : 0;
+      }
       return total;
     }
   },
@@ -37,4 +51,5 @@ export default {
     if (param) return param;
     else return false;
   },
+  getPoints: ({ param }, total) => {},
 };

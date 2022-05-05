@@ -28,7 +28,6 @@ export default {
       const lastDownloadDate = new Date(lastDownload);
       productsFromDb = await that.$dal.getLastUpdateProducts(lastDownloadDate);
       productsFromDb.forEach((productDB) => {
-
         const productLocal = productsLocal.find(
           (productLocal) => productDB.id === productLocal.id
         );

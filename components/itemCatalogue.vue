@@ -1,7 +1,7 @@
 <template>
   <div class="flex p-2 bg-white bg-opacity-100 shadow-g">
     <div class="md:flex-shrink-0">
-      <img 
+      <img
         class="w-20 h-20 scale-0 rounded-md"
         :src="errorPicture ? noPicture : image"
         @error="errorPicture = true"
@@ -22,7 +22,7 @@
           <button class="subtract" @click="changeAmount(-1)">-</button>
           <span class="mx-2">{{ amountLocal }}</span>
           <button class="add" @click="changeAmount(1)">+</button>
-          <span class="mx-2">Importe: ${{ amountLocal * price }}</span>
+          <span class="mx-2">Importe: ${{ round(amountLocal * price) }}</span>
         </div>
       </div>
     </div>
@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import util from '../functions/util.js';
 export default {
   props: {
     image: { type: String, default: () => '' },
@@ -51,6 +52,9 @@ export default {
     changeAmount(amount) {
       this.amountLocal = this.amountLocal + amount;
       this.$emit('changeAmount', this.amountLocal);
+    },
+    round(value) {
+      return util.roundToTwo(value);
     },
   },
 };

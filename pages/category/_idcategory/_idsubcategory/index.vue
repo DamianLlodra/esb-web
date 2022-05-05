@@ -119,17 +119,17 @@ export default {
 
       const subcategories = JSON.parse(localStorage.getItem(this.subcategory));
 
-      this.products = subcategories.products.map((r) => {
-        return {
-          id: r.id,
-          name: r.producto,
-          precio: r.lista,
-          errorPicure: false,
-          picture:
-            r.picture ||
-            linkpicture + r.id + '.PNG?alt=media',
-        };
-      });
+      this.products = subcategories.products
+        .filter((item) => item.lista > 0)
+        .map((r) => {
+          return {
+            id: r.id,
+            name: r.producto,
+            precio: r.lista,
+            errorPicure: false,
+            picture: r.picture || linkpicture + r.id + '.PNG?alt=media',
+          };
+        });
     },
   },
 };

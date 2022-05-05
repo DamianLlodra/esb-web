@@ -1,6 +1,6 @@
 <template>
   <v-responsive>
-    <v-row>
+    <v-row class="p-2">
       <v-col
         v-for="item in categories"
         :key="item.id"
@@ -22,7 +22,7 @@
           >
             <v-img
               :src="item.picture"
-              class="mx-auto rounded-circle"
+              class=" rounded-circle"
               max-width="96"
               max-height="96"
             ></v-img>

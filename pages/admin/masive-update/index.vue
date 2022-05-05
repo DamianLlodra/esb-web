@@ -11,39 +11,30 @@
               </span>
             </v-card-title>
             <v-card-text>
-              <v-form>
-                <v-file-input
-                  v-model="file"
-                  class="mb-2"
-                  label="Seleccionar archivo"
-                  prepend-icon="mdi-file-upload"
-                  accept=".csv"
-                  color="primary"
-                  hide-details
-                ></v-file-input>
-                <!-- <div v-for="header in headersConfig" :key="header.name">
-                  <v-checkbox
-                    v-model="header.import"
-                    :label="header.text"
-                    color="primary"
-                  ></v-checkbox>
-                </div> -->
-                <v-checkbox
-                  v-model="actualizarNombres"
-                  label="Descripciones"
-                  color="primary"
-                ></v-checkbox>
-                <v-checkbox
-                  v-model="actualizarPrecios"
-                  label="Precios"
-                  color="primary"
-                ></v-checkbox>
-                <v-checkbox
-                  v-model="actualizarCategorias"
-                  label="Categorias y Subcategorias"
-                  color="primary"
-                ></v-checkbox>
-              </v-form>
+              <v-file-input
+                v-model="file"
+                class="mb-2"
+                label="Seleccionar archivo"
+                prepend-icon="mdi-file-upload"
+                accept=".xlsx"
+                color="primary"
+                hide-details
+              ></v-file-input>
+              <v-checkbox
+                v-model="actualizarNombres"
+                label="Descripciones"
+                color="primary"
+              ></v-checkbox>
+              <v-checkbox
+                v-model="actualizarPrecios"
+                label="Precios"
+                color="primary"
+              ></v-checkbox>
+              <v-checkbox
+                v-model="actualizarCategorias"
+                label="Categorias y Subcategorias"
+                color="primary"
+              ></v-checkbox>
             </v-card-text>
             <v-card-actions>
               <v-btn
@@ -51,8 +42,16 @@
                 color="primary"
                 @click="updateProducts"
                 :disabled="!file"
-              >
-                <v-icon left>mdi-file-upload</v-icon>
+                ><div>
+                  <v-progress-circular
+                    v-if="loading"
+                    color="green"
+                    indeterminate
+                    rounded
+                    height="6"
+                  ></v-progress-circular>
+                  <v-icon left>mdi-file-upload</v-icon>
+                </div>
                 Importar
               </v-btn>
             </v-card-actions>
@@ -64,6 +63,8 @@
 </template>
 
 <script>
+import { utils, read } from 'xlsx';
+
 export default {
   data() {
     return {
@@ -80,6 +81,7 @@ export default {
       actualizarPrecios: true,
       actualizarCategorias: false,
       headersConfig: {},
+      loading: false,
     };
   },
   computed: {},
@@ -98,13 +100,13 @@ export default {
       if (!file) {
         return;
       }
-
+      this.loading = true;
       const { productsFromCsv, categoriesFromCsv, subcategoriesFromCsv } =
-        await this.loadCsvAsync(file);
+        await this.loadXLSXAsync(file);
+      //await this.loadCsvAsync(file);
 
-      if (productsFromCsv.length === 0) {
-        return;
-      }
+      if (productsFromCsv.length === 0) return;
+
       const { productsFromDB, categoriesFromDB, subcategoriesFromDB } =
         await this.loadDBAsync();
 
@@ -114,6 +116,7 @@ export default {
       );
 
       if (productsToUpdate.length > 0) {
+        
         await this.$dal.saveAll('products', productsToUpdate);
       }
 
@@ -135,6 +138,9 @@ export default {
           await this.$dal.saveAll('subcategories', subcategoriesToUpdate);
         }
       }
+
+      this.loading = false;
+      this.$alertify.success('Productos actualizados');
     },
     compareProducts(productsFromCsv, productsFromDB) {
       const productsToUpdate = [];
@@ -219,10 +225,37 @@ export default {
         };
       });
     },
+    loadXLSXAsync(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsArrayBuffer(file);
+        reader.onload = (e) => {
+          const ddata = new Uint8Array(e.target.result);
+          const workbook = read(ddata, { type: 'array' });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+
+          const json = utils.sheet_to_json(worksheet, {
+            blankrows: false,
+            header: 1,
+          });
+          json.splice(0, 7);
+          const datos = json;
+
+          const resultCsv = this.loadCsv(datos);
+          resolve(resultCsv);
+        };
+      });
+    },
+
     getHeaderToImport() {
       const validHeaders = ['id'];
       if (this.actualizarNombres) validHeaders.push('producto');
-      if (this.actualizarPrecios) validHeaders.push('lista');
+      if (this.actualizarPrecios) {
+        validHeaders.push('lista');
+        validHeaders.push('precio1');
+        validHeaders.push('precio2');
+      }
       if (this.actualizarCategorias) {
         validHeaders.push('familia');
         validHeaders.push('subfamilia');
@@ -230,33 +263,49 @@ export default {
 
       return validHeaders;
     },
-    loadCsv(reader) {
+
+    loadCsv(datos) {
       const productsFromCsv = [];
       const categoriesFromCsv = [];
       const subcategoriesFromCsv = [];
-      const csv = reader.result;
-      const lines = csv.split('\r\n');
-      const headers = lines[7]
-        .toLowerCase()
-        .split(';')
-        .filter((item) => item);
+      //const csv = reader.result;
+      //const lines = csv.split('\r\n');
+
       const cat = new Set();
       const subcat = new Set();
-      for (let i = 8; i < lines.length; i++) {
+
+      //const headers = lines[7]
+      //  .toLowerCase()
+      //  .split(';')
+      //  .filter((item) => item);
+
+      const lineas = datos;
+
+      const headers = lineas[0].map((item) =>
+        item.toLowerCase().replaceAll(' ', '')
+      );
+
+      const lines = lineas;
+      for (let i = 1; i < lines.length; i++) {
         const obj = {};
-        const currentline = lines[i].split(';');
+        //const currentline = lines[i].split(';');
+
+        const currentline = lines[i];
         if (!currentline[0]) continue;
         for (let j = 0; j < headers.length; j++) {
           if (headers[j] && currentline[j]) {
-            obj[j === 0 ? 'id' : headers[j].trim()] = currentline[j]
-              ? currentline[j].trim()
-              : '';
+            const key = j === 0 ? 'id' : headers[j].trim();
+            const value =
+              key === 'id' ? currentline[j].toString() : currentline[j] || '';
+
+            obj[key] = value;
           }
         }
 
         const product = {};
         const headersToImport = this.getHeaderToImport();
-        for (const p in obj) {
+        for (const prop in obj) {
+          const p = prop.toLowerCase();
           if (headersToImport.includes(p)) {
             if (obj[p]) {
               product[p] = obj[p];
@@ -266,7 +315,7 @@ export default {
         if (product.producto) {
           product.nombreProducto = product.producto.toLowerCase().split(' ');
         }
-        if (this.actualizarPrecios) {
+        /*  if (this.actualizarPrecios) {
           if (product.lista) {
             product.lista = Number(
               product.lista.replace('$', '').replace(',', '.').trim()
@@ -288,7 +337,7 @@ export default {
           } else {
             product.precio2 = 0;
           }
-        }
+        } */
         if (this.actualizarCategorias) {
           if (product.familia) {
             product.familia = product.familia.replaceAll('/', '-');

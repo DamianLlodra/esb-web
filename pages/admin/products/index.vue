@@ -120,6 +120,7 @@
       {{ paginator.page }}
       <v-btn @click="nextPage"> <v-icon>mdi-arrow-right</v-icon> </v-btn>
     </div>
+    <v-btn @click="procesar">procesar</v-btn>
   </div>
 </template>
 
@@ -222,7 +223,7 @@ export default {
       },
       deep: true,
     },
-    'selectedProduct.familia': function (newFamilia, oldFamilia) {
+    'selectedProduct.familia'() {
       if (this.selectedProduct.familia) {
         this.getSubcategories();
       }
@@ -369,6 +370,43 @@ export default {
         type: originalFile.type,
         lastModified: originalFile.lastModified,
       });
+    },
+    async procesar() {
+      const products =[];// await this.$dal.getAll('products');
+      const storage = this.$firebase.storage();
+      const files = await storage.ref().child('/fotos').listAll();
+      console.log(files);
+
+      for (const producto of products) {
+        const file = producto.id + '.PNG';
+
+        if (
+          files.items.exist((p) => p.name.toLowerCase() === file.toLowerCase())
+        ) {
+          producto.picture = file;
+        } else {
+          producto.picture = '';
+        }
+        console.log(producto.picture);
+        //console.log(file);
+        //await this.$dal.save('products', producto);
+      }
+      console.log('end');
+    },
+    async fileExistInFirebaseStorage(file) {
+      let exist = false;
+      const storage = this.$firebase.storage();
+
+      const ref = storage.ref('fotos/' + file);
+      try {
+        await ref.getDownloadURL();
+        // Do whatever
+        exist = true;
+      } catch (err) {
+        exist = false;
+        // Doesn't exist... or potentially some other error
+      }
+      return exist;
     },
   },
 };

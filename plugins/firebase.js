@@ -122,8 +122,7 @@ export default ({}, inject) => {
       };
     },
     async getPage(paginator, direction) {
-      console.log(paginator);
-      console.log(direction);
+      
       const collRef = await firebase
         .firestore()
         .collection(paginator.collection);

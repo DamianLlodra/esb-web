@@ -1,55 +1,61 @@
 <template>
   <v-card>
     <v-img
-      height="150px"
+      height="200px"
       contain
       :src="product.errorPicure ? nopicture : product.picture"
     ></v-img>
-    <v-card-title class="d-flex justify-center">{{
-      product.name
-    }}</v-card-title>
+    <v-card-title
+      class="text-wrap justify-center"
+      style="word-break: break-word; text-align: center"
+      v-text="product.name"
+    >
+    </v-card-title>
 
     <div class="d-flex justify-center mt-0">
-      <p class="text-subtitle-1 mb-0 font-weight-bold">
+      <p class="text-h4 mb-0 font-weight-bold">
         <span :class="textPrecio">$ {{ product.price }}</span>
       </p>
     </div>
-    <div class="d-flex justify-center">
+    <!-- <div class="d-flex justify-center">
       <p class="text-caption mt-0 mb-1">Precio de lista final</p>
-    </div>
+    </div> -->
     <v-spacer> </v-spacer>
 
     <v-sheet elevation="30" class="mt-1 align-center rounded-xl">
-      <div class="d-flex justify-center mt-0" elevation="21">
-        <p class="text-subtitle-1 mb-0 font-weight-bold">
+      <div
+        v-if="product.price2"
+        class="d-flex justify-center mt-0"
+        elevation="21"
+      >
+        <p class="text-h4 mb-0 font-weight-bold">
           <span :class="textPrecio1">$ {{ product.price1 }}</span>
         </p>
       </div>
 
-      <div class="d-flex justify-center mt-0">
+      <!-- <div class="d-flex justify-center mt-0">
         <p class="text-caption mt-0 mb-1">
           Precio oferta comprando mas de ${{ param.minimoPrecio1 }}
         </p>
-      </div>
+      </div> -->
     </v-sheet>
     <v-spacer> </v-spacer>
 
-    <div class="d-flex justify-center mt-0">
-      <p class="text-subtitle-1 mb-0 font-weight-bold">
+    <div v-if="product.price2" class="d-flex justify-center mt-0">
+      <p class="text-h4 mb-0 font-weight-bold">
         <span :class="textPrecio2">$ {{ product.price2 }} </span>
       </p>
     </div>
-    <div class="d-flex justify-center mt-0">
+    <!-- <div class="d-flex justify-center mt-0">
       <p class="text-caption mt-0 mb-1">
         Precio oferta comprando mas de ${{ param.minimoPrecio2 }}
       </p>
-    </div>
-
+    </div> -->
     <v-card-text class="d-flex justify-center">
       <v-chip-group>
         <v-chip
           v-if="!product.amount && product.price"
-          class="green ml-2"
+          class="green ml-4"
           @click="changeAmount(1)"
           >Agregar al Pedido</v-chip
         >
@@ -168,11 +174,7 @@ export default {
             price2: r.precio2,
             amount: 0,
             errorPicure: false,
-            picture:
-              r.picture ||
-              'https://firebasestorage.googleapis.com/v0/b/esb-web.appspot.com/o/fotos%2f' +
-                r.id +
-                '.PNG?alt=media',
+            picture: this.getPathPicture(r.id, r.picture),
           };
         });
       const productInCart = this.cart.filter(
@@ -198,6 +200,19 @@ export default {
     },
     goTo(path) {
       this.$router.push(path);
+    },
+    getPathPicture(id, picture) {
+      let filePiecture = picture;
+      if (!filePiecture) {
+        filePiecture = id + '.PNG';
+      }
+
+      const url =
+        'https://firebasestorage.googleapis.com/v0/b/esb-web.appspot.com/o/fotos%2f' +
+        filePiecture +
+        '?alt=media';
+
+      return url;
     },
   },
 };

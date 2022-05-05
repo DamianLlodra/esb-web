@@ -56,6 +56,18 @@
             >
             </v-text-field>
           </div>
+          <div v-else-if="field.inputType === 'textarea'">
+            <v-textarea
+              :label="field.label"
+              :id="field.name"
+              v-model="model[field.name]"
+              :type="field.inputType"
+              :placeholder="field.placeholder || field.label"
+              :prefix="field.prefix"
+              :suffix="field.suffix"
+            >
+            </v-textarea>
+          </div>
           <div v-else>
             <v-text-field
               :label="field.label"

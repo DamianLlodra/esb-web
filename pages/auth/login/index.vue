@@ -1,27 +1,26 @@
 <template>
-  <v-container fluid>
-    <v-row justify="center">
-      <v-card>
-        <v-card-title> Bienvenido a ESB </v-card-title>
-        <!-- <v-card-text> -->
-
-        <div @click="googleLogin" class="google-btn">
-          <div class="google-icon-wrapper">
-            <img
-              class="google-icon"
-              src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
-            />
-          </div>
-          <p class="btn-text"><b>Ingresar con Google</b></p>
+  <v-card>
+    <Home></Home>
+    <v-card-actions class="justify-center">
+      <div @click="googleLogin" class="mt-2 google-btn">
+        <div class="google-icon-wrapper">
+          <img
+            class="google-icon"
+            src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
+          />
         </div>
-        <!-- </v-card-text> -->
-      </v-card>
-    </v-row>
-  </v-container>
+        <p class="btn-text"><b>Ingresar con Google</b></p>
+      </div>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script>
+import Home from '../../../components/Home.vue';
 export default {
+  components: {
+    Home,
+  },
   data() {
     return {
       email: '',

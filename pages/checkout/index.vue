@@ -44,16 +44,25 @@ export default {
     // TODO: validar si hay pedido
     // TODO: IR A PEDIDO CONFIRMADO LUEGO DE CONFIRMAR
     // mostrar alert indicando que se confirmo el pedido
-    confirmarPedido() {
-      this.$dal.save('pedidos', {
-        id: this.entregaId + '-' + this.$store.state.user.user.email,
-        usuario: this.$store.state.user.user.email,
-        fecha: this.entrega,
-        direccion: this.direccion,
-        total: this.totalComprado,
-        productos: this.cart,
-      });
-      this.$store.commit('cart/removeAll');
+
+    async confirmarPedido() {
+      try {
+        await this.$dal.save('pedidos', {
+          id: this.entregaId + '-' + this.$store.state.user.user.email,
+          usuario: this.$store.state.user.user.email,
+          fecha: this.entrega,
+          direccion: this.direccion,
+          total: this.totalComprado[this.totalComprado.current],
+          puntos: this.totalComprado.points,
+          productos: this.cart,
+        });
+
+        this.$store.commit('cart/removeAll');
+        this.$alertify.success('Pedido confirmado');
+      } catch (e) {
+        console.log(e);
+        this.$alertify.error('Error al guardar el pedido');
+      }
     },
     verCompra() {
       this.$router.push('/cart');
@@ -62,5 +71,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>
