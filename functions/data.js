@@ -10,9 +10,7 @@ export default {
   updateSubCategory(productsFromDb, subcategoriesFromDb) {
     for (const subcategory of subcategoriesFromDb) {
       const prds = productsFromDb.filter(
-        (product) =>
-          product.subfamilia ===
-          subcategory.name.toLowerCase().replaceAll('/', '-')
+        (product) => product.subfamilia === subcategory.name.toLowerCase()
       );
       subcategory.products = prds;
       localStorage.setItem(subcategory.id, JSON.stringify(subcategory));
@@ -32,8 +30,16 @@ export default {
           (productLocal) => productDB.id === productLocal.id
         );
         if (productLocal) {
-          const { id, producto, familia, subfamilia, lista, precio1, precio2 } =
-            productDB;
+          const {
+            id,
+            producto,
+            familia,
+            subfamilia,
+            lista,
+            precio1,
+            precio2,
+            hayStock,
+          } = productDB;
           productLocal.id = id;
           productLocal.producto = producto;
           productLocal.familia = familia;
@@ -41,9 +47,9 @@ export default {
           productLocal.lista = lista;
           productLocal.precio1 = precio1;
           productLocal.precio2 = precio2;
+          productLocal.hayStock = hayStock;
         }
       });
-      // console.log("products save " + productsLocal.length);
       localStorage.setItem('products', JSON.stringify(productsLocal));
       subcategoriesFromDb = await that.$dal.getAll('subcategories');
       updcat(productsLocal, subcategoriesFromDb);

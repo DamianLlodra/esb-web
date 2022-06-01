@@ -1,6 +1,7 @@
 <template>
   <form class="p-1">
     <div v-for="field in getFields" :key="field.name">
+      
       <div class="flex flex-row m-2 justify-center">
         <div class="flex flex-col">
           <div v-if="field.inputType === 'select'">
@@ -13,8 +14,8 @@
               :prefix="field.prefix"
               :suffix="field.suffix"
               :items="field.options"
-              item-text="name"
-              item-value="id"
+              :item-text="field.itemText"
+              :item-value="field.itemValue"
             >
             </v-select>
           </div>
@@ -33,15 +34,34 @@
             ></v-file-input>
           </div>
           <div v-else-if="field.inputType === 'checkbox'">
+            
             <div class="flex flex-row items-center m-2">
-              <input
+              <!-- <input
                 :id="field.name"
                 v-model="model[field.name]"
                 :type="field.inputType"
                 :placeholder="field.placeholder || field.label"
                 class="border-2 border-blue-300 focus:border-blue-500"
-              />
-              <label class="ml-1" :for="field.name">{{ field.label }}</label>
+              /> -->
+              <div v-if="field.options && field.options.length > 0">
+                <v-checkbox
+                  v-for="option in field.options"
+                  :key="option.label"
+                  v-model="model[field.name]"
+                  :value="option.value"
+                  :label="option.label"
+                >
+                {{ option.label }}
+                </v-checkbox>
+              </div>
+              <div v-else>
+                
+                <v-checkbox
+                  :id="field.name"
+                  v-model="model[field.name]"
+                  :label="field.label"
+                ></v-checkbox>
+              </div>
             </div>
           </div>
           <div v-else-if="field.inputType === 'number'">
@@ -173,8 +193,8 @@ export default {
             suffix: this.viewConfig[key].suffix,
             prefix: this.viewConfig[key].prefix,
             options: this.viewConfig[key].options,
-            itemsText: this.viewConfig[key].itemsText,
-            itemsValue: this.viewConfig[key].itemsValue,
+            itemText: this.viewConfig[key].itemText,
+            itemValue: this.viewConfig[key].itemValue,
           });
         }
       }

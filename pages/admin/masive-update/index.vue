@@ -103,7 +103,6 @@ export default {
       this.loading = true;
       const { productsFromCsv, categoriesFromCsv, subcategoriesFromCsv } =
         await this.loadXLSXAsync(file);
-      //await this.loadCsvAsync(file);
 
       if (productsFromCsv.length === 0) return;
 
@@ -116,7 +115,6 @@ export default {
       );
 
       if (productsToUpdate.length > 0) {
-        
         await this.$dal.saveAll('products', productsToUpdate);
       }
 
@@ -169,6 +167,17 @@ export default {
           productsToUpdate.push({ ...productCsv, lastUpdate });
         }
       });
+
+      productsFromDB.forEach((productFromDB) => {
+        const productCsv = productsFromCsv.find(
+          (productCsv) => productCsv.id === productFromDB.id
+        );
+        if (!productCsv) {
+          productFromDB.hayStock = false;
+          productsToUpdate.push({ ...productFromDB, lastUpdate });
+        }
+      });
+
       return productsToUpdate;
     },
     compareCategories(categoriesFromCsv, categoriesFromDB) {
@@ -268,17 +277,8 @@ export default {
       const productsFromCsv = [];
       const categoriesFromCsv = [];
       const subcategoriesFromCsv = [];
-      //const csv = reader.result;
-      //const lines = csv.split('\r\n');
-
       const cat = new Set();
       const subcat = new Set();
-
-      //const headers = lines[7]
-      //  .toLowerCase()
-      //  .split(';')
-      //  .filter((item) => item);
-
       const lineas = datos;
 
       const headers = lineas[0].map((item) =>
@@ -288,8 +288,6 @@ export default {
       const lines = lineas;
       for (let i = 1; i < lines.length; i++) {
         const obj = {};
-        //const currentline = lines[i].split(';');
-
         const currentline = lines[i];
         if (!currentline[0]) continue;
         for (let j = 0; j < headers.length; j++) {
@@ -302,7 +300,7 @@ export default {
           }
         }
 
-        const product = {};
+        const product = { hayStock: true };
         const headersToImport = this.getHeaderToImport();
         for (const prop in obj) {
           const p = prop.toLowerCase();
@@ -315,29 +313,6 @@ export default {
         if (product.producto) {
           product.nombreProducto = product.producto.toLowerCase().split(' ');
         }
-        /*  if (this.actualizarPrecios) {
-          if (product.lista) {
-            product.lista = Number(
-              product.lista.replace('$', '').replace(',', '.').trim()
-            );
-          } else {
-            product.lista = 0;
-          }
-          if (product.precio1) {
-            product.precio1 = Number(
-              product.precio1.replace('$', '').replace(',', '.').trim()
-            );
-          } else {
-            product.precio1 = 0;
-          }
-          if (product.precio2) {
-            product.precio2 = Number(
-              product.precio2.replace('$', '').replace(',', '.').trim()
-            );
-          } else {
-            product.precio2 = 0;
-          }
-        } */
         if (this.actualizarCategorias) {
           if (product.familia) {
             product.familia = product.familia.replaceAll('/', '-');
@@ -375,5 +350,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>

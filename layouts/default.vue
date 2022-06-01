@@ -23,7 +23,7 @@
           :rotate="-90"
           color="primary"
           :value="percentPoints"
-          >{{ points }}</v-progress-circular
+          >{{ getTotalPoints }}</v-progress-circular
         >
       </div>
       <v-divider class="mx-2" inset vertical></v-divider>
@@ -58,6 +58,7 @@ export default {
   computed: {
     ...mapState({
       loged: (state) => state.user.user.email,
+      points: (state) => state.user.user.points,
     }),
     ...mapGetters({
       totalComprado: 'cart/totalComprado',
@@ -66,11 +67,14 @@ export default {
       const total = this.totalComprado;
       return total[total.current];
     },
-    percentPoints() {
-      return 50;
+    getTotalPoints() {
+      console.log(this.points);
+      console.log(this.totalComprado.points);
+      return this.points + this.totalComprado.points;
     },
-    points() {
-      return 25;
+    percentPoints() {
+      const totalPoint = 50;
+      return (this.getTotalPoints * 100) / totalPoint;
     },
   },
   created() {
@@ -93,6 +97,11 @@ export default {
 
     if (param) {
       this.$store.commit('cart/setParam', param);
+    }
+
+    const dbuser = await this.$dal.getById('users', this.loged);
+    if (dbuser) {
+      this.$store.commit('user/setUser', dbuser);
     }
   },
   methods: {

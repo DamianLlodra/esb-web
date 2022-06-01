@@ -17,7 +17,9 @@
     "@nuxtjs/pwa": "^3.3.5",
     "@nuxtjs/strapi": "^0.3.1",
     "core-js": "^3.9.1",
+    "file-saver": "^2.0.5",
     "firebase": "8.2.8",
+    "jszip": "^3.9.1",
     "nuxt": "^2.15.3",
     "vue-alertify": "^1.1.0",
     "xlsx": "^0.18.5"

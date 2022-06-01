@@ -41,6 +41,9 @@ export default ({}, inject) => {
           .set(item, { merge: true });
       });
     },
+    async delete(collection, id) {
+      await firebase.firestore().collection(collection).doc(id).delete();
+    },
     async getAll(collection) {
       return await firebase
         .firestore()
@@ -106,35 +109,45 @@ export default ({}, inject) => {
           return data;
         });
     },
-
-    getPaginator(collection, order, limit, searchIn, operator, searchValue) {
+    // searchIn, operator, searchValue
+    getPaginator(collection, order, limit, where) {
       return {
         collection,
-        order: searchIn || order,
+        order,
         limit,
         firstDocument: null,
         lastDocument: null,
         data: [],
         page: 1,
-        searchIn,
-        searchValue,
-        operator,
+        where: where || [],
       };
     },
     async getPage(paginator, direction) {
-      
       const collRef = await firebase
         .firestore()
         .collection(paginator.collection);
 
       let query1;
 
-      if (paginator.searchIn && paginator.searchValue) {
-        query1 = collRef.where(
-          paginator.searchIn,
-          paginator.operator,
-          paginator.searchValue
-        );
+      // if (paginator.searchIn && paginator.searchValue) {
+      //   query1 = collRef.where(
+      //     paginator.searchIn,
+      //     paginator.operator,
+      //     paginator.searchValue
+      //   );
+      // }
+
+      // query1 = (query1 || collRef).where('hayStock', '==', true);
+      // query1 = (query1 || collRef).where('picture', '==', '');
+
+      if (paginator.where.length > 0) {
+        paginator.where.forEach((where) => {
+          query1 = (query1 || collRef).where(
+            where.searchIn,
+            where.operator,
+            where.searchValue
+          );
+        });
       }
 
       const query2 = (query1 || collRef).orderBy(paginator.order);
@@ -238,6 +251,20 @@ export default ({}, inject) => {
         return paginator;
       });
       return collection;
+    },
+    async getOrdersByDate(date) {
+      return await firebase
+        .firestore()
+        .collection('pedidos')
+        .where('fecha', '==', date)
+        .get()
+        .then((snapshot) => {
+          const data = [];
+          snapshot.forEach((doc) => {
+            data.push(doc.data());
+          });
+          return data;
+        });
     },
   };
 

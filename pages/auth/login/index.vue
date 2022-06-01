@@ -44,12 +44,14 @@ export default {
             email,
             isAdmin: false,
             id: email,
+            points: 0,
           });
         }
         this.$store.commit('user/setUser', {
           displayName,
           email,
           isAdmin: user.isAdmin,
+          points: user.points,
         });
 
         this.$router.push('/');

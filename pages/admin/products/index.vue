@@ -15,8 +15,11 @@
         <v-toolbar flat>
           <v-toolbar-title>Productos</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
+
           <v-spacer></v-spacer>
+
           <v-combobox
+            :disabled="showIncomplete"
             v-model="searchIn"
             :items="headers.filter((header) => header.canSearch)"
             label="Buscar en"
@@ -25,12 +28,15 @@
             item-text="text"
           ></v-combobox>
           <v-text-field
+            :disabled="showIncomplete"
             v-model="searchValue"
             label="Valor buscado"
             single-line
             hide-details
           ></v-text-field>
-          <v-btn small @click="search"><v-icon>mdi-magnify</v-icon></v-btn>
+          <v-btn small @click="search" :disabled="showIncomplete"
+            ><v-icon>mdi-magnify</v-icon></v-btn
+          >
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog">
             <template v-slot:activator="{ on, attrs }">
@@ -96,6 +102,14 @@
             </v-card>
           </v-dialog>
         </v-toolbar>
+        <v-toolbar flat>
+          <v-toolbar-title>
+            <v-checkbox
+              v-model="showIncomplete"
+              label="Mostrar solo productos incompletos con stock"
+            ></v-checkbox>
+          </v-toolbar-title>
+        </v-toolbar>
       </template>
       <template v-slot:item.actions="{ item }">
         <v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
@@ -120,7 +134,7 @@
       {{ paginator.page }}
       <v-btn @click="nextPage"> <v-icon>mdi-arrow-right</v-icon> </v-btn>
     </div>
-    <v-btn @click="procesar">procesar</v-btn>
+    <!-- <v-btn @click="procesar">procesar</v-btn> -->
   </div>
 </template>
 
@@ -169,6 +183,12 @@ export default {
           required: true,
           defaultValue: 0,
         },
+        hayStock: {
+          inputType: 'checkbox',
+          label: 'Hay Stock',
+          required: true,
+          defaultValue: 0,
+        },
         imagenFrom: {
           inputType: 'text',
           label: 'Tomar imagen desde otro Articulo:',
@@ -214,6 +234,7 @@ export default {
       options: {},
       categories: [],
       subcategories: [],
+      showIncomplete: false,
     };
   },
   watch: {
@@ -227,6 +248,13 @@ export default {
       if (this.selectedProduct.familia) {
         this.getSubcategories();
       }
+    },
+    showIncomplete: {
+      handler() {
+        this.searchIn = '';
+        this.sarchValue = '';
+        this.search();
+      },
     },
   },
   async created() {
@@ -251,24 +279,54 @@ export default {
       this.subcategories = await this.$dal.getAll('subcategories');
     },
     async search() {
+      const where = [];
+      if (this.searchIn.value && this.searchValue) {
+        const searchWhere = {
+          searchIn:
+            this.searchIn.value === 'producto'
+              ? 'nombreProducto'
+              : this.searchIn.value,
+          operator:
+            this.searchIn.value === 'producto' ? 'array-contains' : '>=',
+          searchValue:
+            this.searchIn.value === 'producto'
+              ? this.searchValue.toLowerCase()
+              : this.searchValue,
+        };
+        where.push(searchWhere);
+      }
+      if (this.showIncomplete) {
+        const filterStock = {
+          searchIn: 'hayStock',
+          operator: '==',
+          searchValue: true,
+        };
+        where.push(filterStock);
+        const filterPicture = {
+          searchIn: 'picture',
+          operator: '==',
+          searchValue: '',
+        };
+        where.push(filterPicture);
+      }
       this.paginator = await this.$dal.getPaginator(
         'products',
-        'id',
+        this.searchIn.value || 'id',
         this.itemsPerPage,
-        this.searchIn.value === 'producto'
-          ? 'nombreProducto'
-          : this.searchIn.value,
-        this.searchIn.value === 'producto' ? 'array-contains' : '>=',
-        this.searchIn.value === 'producto'
-          ? this.searchValue.toLowerCase()
-          : this.searchValue
+        where
       );
       this.paginator = await this.$dal.getPage(this.paginator);
     },
     getSubcategories() {
-      this.viewConfig.subfamilia.options = this.subcategories.filter(
-        (subcategory) => subcategory.category === this.selectedProduct.familia
-      );
+      this.viewConfig.subfamilia.options = this.subcategories
+        .filter(
+          (subcategory) => subcategory.category === this.selectedProduct.familia
+        )
+        .map((subcategory) => ({
+          name: subcategory.name,
+          id: subcategory.name.toLowerCase(),
+          category: subcategory.category,
+        }));
     },
     close() {
       this.dialog = false;
@@ -340,6 +398,7 @@ export default {
       const reader = new FileReader();
       if (file) {
         const fileName = this.selectedProduct.id + '.PNG';
+        this.$set(this.selectedProduct, 'picture', fileName);
         file = this.renameFile(file, fileName);
         reader.onload = () => {
           if (reader.readyState === 2) {
@@ -372,26 +431,33 @@ export default {
       });
     },
     async procesar() {
-      const products =[];// await this.$dal.getAll('products');
+      const allproducts = await this.$dal.getAll('products');
+
+      const products = allproducts.filter((p) => !p.picture);
       const storage = this.$firebase.storage();
       const files = await storage.ref().child('/fotos').listAll();
-      console.log(files);
 
       for (const producto of products) {
         const file = producto.id + '.PNG';
 
         if (
-          files.items.exist((p) => p.name.toLowerCase() === file.toLowerCase())
+          files.items.some((p) => p.name.toLowerCase() === file.toLowerCase())
         ) {
           producto.picture = file;
         } else {
           producto.picture = '';
         }
-        console.log(producto.picture);
-        //console.log(file);
-        //await this.$dal.save('products', producto);
+        /* if (producto.subfamilia) {
+          const sf = producto.subfamilia.split('-');
+          if (sf.length === 1) {
+            producto.subfamilia = sf[0];
+          } else {
+            producto.subfamilia = sf[1];
+          }
+        } */
+  
+        await this.$dal.save('products', producto);
       }
-      console.log('end');
     },
     async fileExistInFirebaseStorage(file) {
       let exist = false;

@@ -51,7 +51,8 @@
         Precio oferta comprando mas de ${{ param.minimoPrecio2 }}
       </p>
     </div> -->
-    <v-card-text class="d-flex justify-center">
+
+    <v-card-text v-if="puedeComprar" class="d-flex justify-center">
       <v-chip-group>
         <v-chip
           v-if="!product.amount && product.price"
@@ -73,6 +74,10 @@
           ><v-icon>mdi-plus</v-icon></v-chip
         >
       </v-chip-group>
+    </v-card-text>
+    <v-card-text v-else class="d-flex justify-center">
+      Puede tomar pedidos desde las {{ param.rules.horaDesde }}hs. hasta las
+      {{ param.rules.horaHasta }}hs.
     </v-card-text>
     <v-card-title class="d-flex justify-center">
       <span v-if="product.amount">Importe: ${{ totalItemRounded }}</span>
@@ -113,6 +118,14 @@ export default {
       totalComprado: 'cart/totalComprado',
       param: 'cart/getParam',
     }),
+    puedeComprar() {
+      const hours = new Date().getHours();
+      const minutes = new Date().getMinutes();
+      const time = hours * 100 + minutes;
+      const desde = +this.param.rules.horaDesde.replaceAll(':', '');
+      const hasta = +this.param.rules.horaHasta.replaceAll(':', '');
+      return time >= desde && time <= hasta;
+    },
     totalItemRounded() {
       const { current } = this.totalComprado;
       let price = this.product.price;

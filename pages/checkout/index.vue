@@ -1,9 +1,21 @@
 <template>
   <v-card>
     <v-card-title> Confirmar Pedido </v-card-title>
+    <v-card-text class="text-h6">
+      Total: $ {{ totalComprado[totalComprado.current] }}
+    </v-card-text>
     <v-card-text class="text-h6"
-      >Total a pagar: $ {{ totalComprado[totalComprado.current] }}</v-card-text
+      >Puntos por esta compra: {{ totalComprado.points }}</v-card-text
     >
+    <v-card-text class="text-h6">Puntos acumulados: {{ points }}</v-card-text>
+    <v-card-text v-if="premio > 0" class="text-h6"
+      >Descuento por puntos ${{ premio }}</v-card-text
+    >
+    <v-card-text class="text-h6"
+      >Total a pagar $
+      {{ totalComprado[totalComprado.current] - premio }}</v-card-text
+    >
+
     <v-card-text class="text-h6">Fecha de entrega: {{ entrega }}</v-card-text>
     <v-card-text class="text-h6"
       >Dirección de entrega: {{ direccion }}</v-card-text
@@ -35,13 +47,24 @@ export default {
   computed: {
     ...mapState({
       cart: (state) => state.cart.cart,
+      points: (state) => state.user.user.points,
+      canjePuntos: (state) => state.cart.param.canjePuntos,
+      currentUser: (state) => state.user.user,
     }),
     ...mapGetters({
       totalComprado: 'cart/totalComprado',
     }),
+    premio() {
+      if (this.canjePuntos) {
+        const premio = this.canjePuntos.filter(
+          (cp) => this.points >= cp.puntosDesde && this.points <= cp.puntosHasta
+        );
+
+        return premio && premio.length > 0 ? premio[0].importe : 0;
+      } else return 0;
+    },
   },
   methods: {
-    // TODO: validar si hay pedido
     // TODO: IR A PEDIDO CONFIRMADO LUEGO DE CONFIRMAR
     // mostrar alert indicando que se confirmo el pedido
 
@@ -50,14 +73,18 @@ export default {
         await this.$dal.save('pedidos', {
           id: this.entregaId + '-' + this.$store.state.user.user.email,
           usuario: this.$store.state.user.user.email,
-          fecha: this.entrega,
+          fecha: this.entregaId,
           direccion: this.direccion,
           total: this.totalComprado[this.totalComprado.current],
           puntos: this.totalComprado.points,
           productos: this.cart,
+          currentPrice: this.totalComprado.current,
         });
-
+        const user = { ...this.$store.state.user.user };
+        user.points += this.totalComprado.points;
+        await this.$dal.save('users', user);
         this.$store.commit('cart/removeAll');
+        this.$store.commit('user/setUser', user);
         this.$alertify.success('Pedido confirmado');
       } catch (e) {
         console.log(e);

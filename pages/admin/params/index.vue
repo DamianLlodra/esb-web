@@ -5,7 +5,7 @@
       <v-tab>Descuentos</v-tab>
       <v-tab>Puntos</v-tab>
       <v-tab>Premios</v-tab>
-
+      <v-tab>Reglas</v-tab>
     </v-tabs>
     <v-tabs-items v-model="tab">
       <v-tab-item>
@@ -16,8 +16,6 @@
       </v-tab-item>
       <v-tab-item>
         <v-dialog v-model="dialog" persistent max-width="600px">
-          <!-- <template v-slot:activator="{ on, attrs }">
-          </template> -->
           <v-card>
             <form-generic
               :model="puntos"
@@ -61,8 +59,6 @@
       </v-tab-item>
       <v-tab-item>
         <v-dialog v-model="dialogCP" persistent max-width="600px">
-          <!-- <template v-slot:activator="{ on, attrs }">
-          </template> -->
           <v-card>
             <form-generic
               :model="canjePuntos"
@@ -87,7 +83,7 @@
               <th>Premio $</th>
               <th></th>
               <th>
-                <v-btn x-small color="green" @click="addPuntos">
+                <v-btn x-small color="green" @click="addCanjePuntos">
                   <v-icon>mdi-plus</v-icon>
                 </v-btn>
               </th>
@@ -96,7 +92,7 @@
           <tbody>
             <tr v-for="(item, index) in data.canjePuntos" :key="index">
               <td>{{ item.puntosDesde }}</td>
-              <td>{{ item.puntoseHasta }}</td>
+              <td>{{ item.puntosHasta }}</td>
               <td>{{ item.importe }}</td>
               <td>
                 <v-icon @click="editCanjePuntos(item)">mdi-file-edit</v-icon>
@@ -107,6 +103,9 @@
             </tr>
           </tbody>
         </v-simple-table>
+      </v-tab-item>
+      <v-tab-item>
+        <form-generic :model="data.rules" :viewConfig="vcRules"></form-generic>
       </v-tab-item>
     </v-tabs-items>
     <v-card-actions class="justify-center">
@@ -163,7 +162,7 @@ export default {
         },
       },
       vcCanjePuntos: {
-        punosDesde: {
+        puntosDesde: {
           label: 'Desde',
           type: 'number',
           required: true,
@@ -232,6 +231,57 @@ export default {
           suffix: '',
         },
       },
+      vcRules: {
+        horaDesde: {
+          label: 'Hora Pedido Desde',
+          dataType: 'time',
+          inputType: 'time',
+          defaultValue: '00:00',
+        },
+        horaHasta: {
+          label: 'Hora Pedido Hasta',
+          dataType: 'time',
+          inputType: 'time',
+          defaultValue: '23:59',
+        },
+        dias: {
+          label: 'Dias',
+          type: 'array',
+          required: true,
+          defaultValue: [],
+          inputType: 'checkbox',
+          options: [
+            {
+              label: 'Lunes',
+              value: 1,
+            },
+            {
+              label: 'Martes',
+              value: 2,
+            },
+            {
+              label: 'Miercoles',
+              value: 3,
+            },
+            {
+              label: 'Jueves',
+              value: 4,
+            },
+            {
+              label: 'Viernes',
+              value: 5,
+            },
+            {
+              label: 'Sabado',
+              value: 6,
+            },
+            {
+              label: 'Domingo',
+              value: 7,
+            },
+          ],
+        },
+      },
     };
   },
   data() {
@@ -255,6 +305,11 @@ export default {
           subtitle: '',
           description: '',
         },
+        rules: {
+          horaDesde: '',
+          horaHasta: '',
+          dias: [],
+        },
       },
       puntos: {
         id: 0,
@@ -265,7 +320,7 @@ export default {
       canjePuntos: {
         id: 0,
         puntosDesde: 0,
-        puntoseHasta: 0,
+        puntosHasta: 0,
         importe: 0,
       },
     };
@@ -318,12 +373,15 @@ export default {
       this.canjePuntos = {
         id: 0,
         puntosDesde: 0,
-        puntoseHasta: 0,
+        puntosHasta: 0,
         importe: 0,
       };
+      if (!this.data.canjePuntos) this.data.canjePuntos = [];
+
       if (this.data.canjePuntos.length > 0) {
         this.canjePuntos.puntosDesde =
-          this.data.canjePuntos[this.data.canjePuntos.length - 1].puntosHasta + 1;
+          this.data.canjePuntos[this.data.canjePuntos.length - 1].puntosHasta +
+          1;
       }
       this.dialogCP = true;
     },
@@ -347,7 +405,7 @@ export default {
     },
     saveCanjePuntos() {
       this.dialogCP = false;
-      if (this.canjePuntos.puntosDesde > this.canjePuntos.puntoseHasta) {
+      if (this.canjePuntos.puntosDesde > this.canjePuntos.puntosHasta) {
         this.$alertify.error(
           'El puntos desde no puede ser mayor al puntos hasta'
         );

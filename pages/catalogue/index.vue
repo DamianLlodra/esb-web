@@ -40,19 +40,19 @@
             min-height="200"
             transition="fade-transition"
           >
-          <div@click="goToItem(item)">
-            <item-catalogue
-              
-              max-height="155"
-              :key="index"
-              :title="item.name"
-              :subtitle="'Precio: $' + item.price"
-              :image="item.image"
-              :no-picture="noPicture"
-              :price="item.price"
-              :amount="item.amount"
-              @changeAmount="addOrder($event, item)"
-            ></item-catalogue></div>
+            <div @click="goToItem(item)">
+              <item-catalogue
+                max-height="155"
+                :key="index"
+                :title="item.name"
+                :subtitle="'Precio: $' + item.price"
+                :image="item.image"
+                :no-picture="noPicture"
+                :price="item.price"
+                :amount="item.amount"
+                @changeAmount="addOrder($event, item)"
+              ></item-catalogue>
+            </div>
           </v-lazy>
         </template>
       </v-virtual-scroll>
@@ -79,7 +79,6 @@ export default {
       selectedCategory: '',
       categories: [],
       search: '',
-     
     };
   },
   data() {
@@ -89,7 +88,7 @@ export default {
       selectedCategory: '',
       categories: [],
       isActive: false,
-       noPicture:
+      noPicture:
         'https://firebasestorage.googleapis.com/v0/b/esb-web.appspot.com/o/fotos%2fina.png?alt=media',
     };
   },
@@ -148,7 +147,8 @@ export default {
       if (productsLocalJson) {
         productsLocal = JSON.parse(productsLocalJson);
       }
-      return productsLocal;
+
+      return productsLocal.filter((product) => product.hayStock === true);
     },
     async updateLocalCatalog() {
       const productsLocal = this.getProductsLocal();
@@ -165,12 +165,14 @@ export default {
               (productLocal) => productDB.id === productLocal.id
             );
             if (productLocal) {
-              const { id, producto, familia, subfamilia, lista } = productLocal;
+              const { id, producto, familia, subfamilia, lista, hayStock } =
+                productLocal;
               productDB.id = id;
               productDB.producto = producto;
               productDB.familia = familia;
               productDB.subfamilia = subfamilia;
               productDB.lista = lista;
+              productDB.hayStock = hayStock;
             }
           });
           localStorage.setItem('products', JSON.stringify(productsLocal));
@@ -184,17 +186,19 @@ export default {
     },
     loadLocalCatalog() {
       const productsLocal = JSON.parse(localStorage.getItem('products'));
-     
-      this.products = productsLocal.map((p) => {
-        return {
-          id: p.id,
-          name: p.producto,
-          price: p.lista,
-          image: this.getPathPicture(p.id, p.picture),
-          category: p.familia,
-          subcategory: p.subfamilia,
-        };
-      });
+
+      this.products = productsLocal
+        .filter((p) => p.hayStock)
+        .map((p) => {
+          return {
+            id: p.id,
+            name: p.producto,
+            price: p.lista,
+            image: this.getPathPicture(p.id, p.picture),
+            category: p.familia,
+            subcategory: p.subfamilia,
+          };
+        });
     },
     loadCategories() {
       this.$dal.getAll('categories').then((categories) => {
@@ -206,7 +210,14 @@ export default {
     },
     goToItem(item) {
       this.$router.push(
-        'category/' + item.category + '/' + item.category+'-'+item.subcategory + '/' + item.id
+        'category/' +
+          item.category +
+          '/' +
+          item.category +
+          '-' +
+          item.subcategory +
+          '/' +
+          item.id
       );
     },
     getPathPicture(id, picture) {

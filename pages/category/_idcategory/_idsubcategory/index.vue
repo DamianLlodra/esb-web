@@ -118,16 +118,19 @@ export default {
         'https://firebasestorage.googleapis.com/v0/b/esb-web.appspot.com/o/fotos%2F';
 
       const subcategories = JSON.parse(localStorage.getItem(this.subcategory));
-
+      console.log(subcategories.products);
       this.products = subcategories.products
-        .filter((item) => item.lista > 0)
+        .filter((item) => item.lista > 0 && item.hayStock)
         .map((r) => {
           return {
             id: r.id,
             name: r.producto,
             precio: r.lista,
             errorPicure: false,
-            picture: r.picture || linkpicture + r.id + '.PNG?alt=media',
+            picture: r.picture
+              ? linkpicture + r.picture + '?alt=media'
+              : linkpicture + r.id + '.PNG?alt=media',
+            hayStock: r.hayStock,
           };
         });
     },

@@ -51,5 +51,12 @@ export default {
     if (param) return param;
     else return false;
   },
-  getPoints: ({ param }, total) => {},
+  getPoints: ({ param }, total) => {
+    if (param && param.puntos) {
+      const puntos = param.puntos.find(
+        (p) => p.importeDesde <= total && p.importeHasta >= total
+      );
+      return puntos ? puntos.puntos : 0;
+    }
+  },
 };

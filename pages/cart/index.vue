@@ -1,6 +1,11 @@
 <template>
   <div class="div">
     <v-card>
+      <v-card-text v-if="cart.length === 0">
+        <v-alert :value="true" type="info" icon="mdi-cart" color="primary"
+          >No hay productos en el carrito</v-alert
+        >
+      </v-card-text>
       <v-virtual-scroll bench="5" :items="cart" item-height="155" height="400">
         <template v-slot:default="{ item, index }">
           <item-catalogue
@@ -60,7 +65,6 @@ export default {
       //TODO: add confirm alert
       this.$store.commit('cart/removeAll');
       //TODO: go to category
-
     },
     goToCart() {
       this.$router.push('/category/');
