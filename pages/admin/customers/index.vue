@@ -6,7 +6,7 @@
           <list-item :title="item.nombre" :subtitle1="item.domicilio" />
         </nuxt-link>
       </ul>
-      <nuxt-link class="button" :to="'new'">Nuevo</nuxt-link>
+      <nuxt-link class="button" :to="'/admin/customers/new'">Nuevo</nuxt-link>
     </div>
   </div>
 </template>
@@ -17,12 +17,18 @@ export default {
   components: { ListItem },
   data() {
     return {
-      items: [
-        { id: 1, nombre: 'damian', domicilio: '465 990' },
-        { id: 2, nombre: 'Saulo', domicilio: 'no se, pero es en Olavarria' },
-        { id: 3, nombre: 'otro', domicilio: 'pampa y la via' },
-      ],
+      items: [],
     };
+  },
+  created() {
+    this.getItems();
+  },
+  methods: {
+    getItems() {
+      this.$dal.getAll('customers').then((items) => {
+        this.items = items;
+      });
+    },
   },
 };
 </script>

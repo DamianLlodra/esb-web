@@ -1,151 +1,108 @@
 <template>
-  <!-- <div class="mt-2 flex flex-row justify-center">
-    <div class="flex flex-col">
-      <h4>Ingreso</h4>
-      <Notification v-if="error" type="danger" :message="error" />
-      <form
-        class="m-2 flex flex-col justify-center"
-        method="post"
-        @submit.prevent="login"
-      >
-        <div class="object-cover">
-          <label>Email</label>
-          <div>
-            <input
-              v-model="email"
-              class="border-2 border-green-300 focus:border-green-500"
-              type="email"
-              name="email"
-            />
-          </div>
+  <v-card>
+    <Home></Home>
+    <v-card-actions class="justify-center">
+      <div @click="googleLogin" class="mt-2 google-btn">
+        <div class="google-icon-wrapper">
+          <img
+            class="google-icon"
+            src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
+          />
         </div>
-        <div>
-          <label>Clave</label>
-          <div>
-            <input
-              v-model="password"
-              class="border-2 border-green-300 focus:border-green-500"
-              type="password"
-              name="password"
-            />
-          </div>
-        </div>
-
-        <button class="mt-2" type="submit">Ingresar</button>
-      </form>
-      <div class="mt-2">
-        <p>
-          ¿Aun no tiene cuenta?
-          <nuxt-link to="/register">Registrese</nuxt-link>
-        </p>
-        <p>
-          <nuxt-link to="/forgot">¿Olvido su clave?</nuxt-link>
-        </p>
+        <p class="btn-text"><b>Ingresar con Google</b></p>
       </div>
-    </div>
-  </div> -->
-
-  <div class="w-full h-screen flex items-center justify-center">
-    <form class="w-full md:w-1/3 bg-white rounded-lg" @submit.prevent="login">
-      <h2 class="text-3xl text-center text-gray-700 mb-4">Ingreso</h2>
-      <div class="px-12 pb-10">
-        <div class="w-full mb-2">
-          <div class="flex items-center">
-            <i
-              class="ml-3 fill-current text-gray-400 text-xs z-10 fas fa-user"
-            ></i>
-            <input
-              v-model="email"
-              type="email"
-              placeholder="Email"
-              class="
-                -mx-6
-                px-8
-                w-full
-                border
-                rounded
-                px-3
-                py-2
-                text-gray-700
-                focus:outline-none
-              "
-            />
-          </div>
-        </div>
-        <div class="w-full mb-2">
-          <div class="flex items-center">
-            <i
-              class="ml-3 fill-current text-gray-400 text-xs z-10 fas fa-lock"
-            ></i>
-            <input
-              v-model="password"
-              type="text"
-              placeholder="Clave"
-              class="
-                -mx-6
-                px-8
-                w-full
-                border
-                rounded
-                px-3
-                py-2
-                text-gray-700
-                focus:outline-none
-              "
-            />
-          </div>
-        </div>
-        <nuxt-link
-          to="/auth/forgot"
-          class="text-xs text-gray-500 float-right mb-4"
-          >¿Olvido su clave?</nuxt-link
-        >
-        <button
-          type="submit"
-          class="
-            w-full
-            py-2
-            rounded-full
-            bg-green-400
-            text-gray-100
-            focus:outline-none
-          "
-        >
-          Ingresar
-        </button>
-      </div>
-    </form>
-  </div>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script>
-import Notification from '~/components/Notification.vue';
+import Home from '../../../components/Home.vue';
 export default {
   components: {
-    Notification,
+    Home,
   },
   data() {
     return {
       email: '',
       password: '',
-      error: null,
     };
   },
   methods: {
-    async login() {
-      this.error = null;
+    async googleLogin() {
       try {
-        await this.$auth.loginWith('local', {
-          data: {
-            identifier: this.email,
-            password: this.password,
-          },
+        let redirectUri = '/';
+        const result = await this.$firebase
+          .auth()
+          .signInWithPopup(new this.$firebase.auth.GoogleAuthProvider());
+
+        const { displayName, email } = result.user;
+
+        let user = await this.$dal.getById('users', email);
+
+        if (!user) {
+          redirectUri = '/customer/profile';
+          user = {
+            displayName,
+            email,
+            isAdmin: false,
+            id: email,
+            points: 0,
+          };
+          await this.$dal.save('users', user);
+        }
+        this.$store.commit('user/setUser', {
+          id: email,
+          displayName,
+          email,
+          isAdmin: user.isAdmin,
+          points: user.points,
         });
-        this.$router.push('/catalogue');
+
+        this.$router.push(redirectUri);
       } catch (e) {
-        this.error = e.response.data.message[0].messages[0].message;
+        console.log(e);
       }
     },
   },
 };
 </script>
+<style>
+@import url(https://fonts.googleapis.com/css?family=Roboto:500);
+.google-btn {
+  width: 184px;
+  height: 42px;
+  background-color: #4285f4;
+  border-radius: 2px;
+  box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.25);
+}
+.google-btn .google-icon-wrapper {
+  position: absolute;
+  margin-top: 1px;
+  margin-left: 1px;
+  width: 40px;
+  height: 40px;
+  border-radius: 2px;
+  background-color: #fff;
+}
+.google-btn .google-icon {
+  position: absolute;
+  margin-top: 11px;
+  margin-left: 11px;
+  width: 18px;
+  height: 18px;
+}
+.google-btn .btn-text {
+  float: right;
+  margin: 11px 6px 0 0;
+  color: #fff;
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  font-family: 'Roboto';
+}
+.google-btn:hover {
+  box-shadow: 0 0 6px #4285f4;
+}
+.google-btn:active {
+  background: #1669f2;
+}
+</style>

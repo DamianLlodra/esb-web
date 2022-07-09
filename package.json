@@ -1,5 +1,5 @@
 {
-  "name": "vn-web",
+  "name": "esb-web",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -13,10 +13,16 @@
   "dependencies": {
     "@nuxtjs/auth": "^4.9.1",
     "@nuxtjs/axios": "^5.13.1",
+    "@nuxtjs/firebase": "^7.6.1",
     "@nuxtjs/pwa": "^3.3.5",
     "@nuxtjs/strapi": "^0.3.1",
     "core-js": "^3.9.1",
-    "nuxt": "^2.15.3"
+    "file-saver": "^2.0.5",
+    "firebase": "8.2.8",
+    "jszip": "^3.9.1",
+    "nuxt": "^2.15.3",
+    "vue-alertify": "^1.1.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@mdi/font": "^6.2.95",

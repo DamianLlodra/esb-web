@@ -1,7 +1,11 @@
 <template>
   <div class="flex p-2 bg-white bg-opacity-100 shadow-g">
     <div class="md:flex-shrink-0">
-      <img class="w-20 h-20 scale-0 rounded-md" :src="image" />
+      <img
+        class="w-20 h-20 scale-0 rounded-md"
+        :src="errorPicture ? noPicture : image"
+        @error="errorPicture = true"
+      />
     </div>
     <div class="flex flex-col ml-2">
       <p class="font-semibold">{{ title }}</p>
@@ -14,11 +18,11 @@
           >Agregar</span
         >
         <div v-if="amountLocal" class="flex items-center">
-          <span class="mr-2 p-1 bg rounded-lg">Agregado</span>
+          <!-- <span class="mr-2 p-1 bg rounded-lg">Agregado</span> -->
           <button class="subtract" @click="changeAmount(-1)">-</button>
           <span class="mx-2">{{ amountLocal }}</span>
           <button class="add" @click="changeAmount(1)">+</button>
-          <span class="mx-2">Importe: ${{ amountLocal * price }}</span>
+          <span class="mx-2">Importe: ${{ round(amountLocal * price) }}</span>
         </div>
       </div>
     </div>
@@ -26,16 +30,18 @@
 </template>
 
 <script>
+import util from '../functions/util.js';
 export default {
   props: {
     image: { type: String, default: () => '' },
+    noPicture: { type: String, default: () => '' },
     title: { type: String, default: () => '' },
     subtitle: { type: String, default: () => '' },
     price: { type: Number, default: () => 0 },
     amount: { type: Number, default: () => 0 },
   },
   data() {
-    return { amountLocal: this.amount };
+    return { amountLocal: this.amount, errorPicture: false };
   },
   watch: {
     amount(newVal) {
@@ -46,6 +52,9 @@ export default {
     changeAmount(amount) {
       this.amountLocal = this.amountLocal + amount;
       this.$emit('changeAmount', this.amountLocal);
+    },
+    round(value) {
+      return util.roundToTwo(value);
     },
   },
 };
@@ -76,6 +85,6 @@ export default {
 }
 .add,
 .subtract {
-  @apply rounded-full w-5 h-5 font-bold flex items-center justify-center focus:outline-none;
+  @apply rounded-full w-8 h-8 font-bold flex items-center justify-center focus:outline-none;
 }
 </style>

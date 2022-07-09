@@ -1,32 +1,104 @@
 <template>
-  <form class="p-2">
+  <form class="p-1">
     <div v-for="field in getFields" :key="field.name">
-      <div v-if="field.inputType === 'select'"></div>
-      <div v-else-if="field.inputType === 'option'"></div>
-      <div v-else-if="field.inputType === 'currency'"></div>
-      <div v-else-if="field.inputType === 'checkbox'">
-        <div class="flex flex-row items-center m-2">
-          <input
-            :id="field.name"
-            v-model="model[field.name]"
-            :type="field.inputType"
-            :placeholder="field.placeholder || field.label"
-            class="border-2 border-blue-300 focus:border-blue-500"
-          />
-          <label class="ml-1" :for="field.name">{{ field.label }}</label>
-        </div>
-      </div>
-      <div v-else>
-        <div class="flex flex-row m-2 justify-center">
-          <div class="flex flex-col">
-            <label :for="field.name">{{ field.label }}</label>
-            <input
+      
+      <div class="flex flex-row m-2 justify-center">
+        <div class="flex flex-col">
+          <div v-if="field.inputType === 'select'">
+            <v-select
+              :label="field.label"
               :id="field.name"
               v-model="model[field.name]"
               :type="field.inputType"
               :placeholder="field.placeholder || field.label"
-              class="border-2 border-green-300 focus:border-green-500"
-            />
+              :prefix="field.prefix"
+              :suffix="field.suffix"
+              :items="field.options"
+              :item-text="field.itemText"
+              :item-value="field.itemValue"
+            >
+            </v-select>
+          </div>
+          <div v-else-if="field.inputType === 'option'"></div>
+          <div v-else-if="field.inputType === 'currency'"></div>
+          <div v-else-if="field.inputType === 'file'">
+            <v-file-input
+              :label="field.label"
+              :id="field.name"
+              v-model="model[field.name]"
+              key=""
+              type="file"
+              :placeholder="field.placeholder || field.label"
+              :prefix="field.prefix"
+              :suffix="field.suffix"
+            ></v-file-input>
+          </div>
+          <div v-else-if="field.inputType === 'checkbox'">
+            
+            <div class="flex flex-row items-center m-2">
+              <!-- <input
+                :id="field.name"
+                v-model="model[field.name]"
+                :type="field.inputType"
+                :placeholder="field.placeholder || field.label"
+                class="border-2 border-blue-300 focus:border-blue-500"
+              /> -->
+              <div v-if="field.options && field.options.length > 0">
+                <v-checkbox
+                  v-for="option in field.options"
+                  :key="option.label"
+                  v-model="model[field.name]"
+                  :value="option.value"
+                  :label="option.label"
+                >
+                {{ option.label }}
+                </v-checkbox>
+              </div>
+              <div v-else>
+                
+                <v-checkbox
+                  :id="field.name"
+                  v-model="model[field.name]"
+                  :label="field.label"
+                ></v-checkbox>
+              </div>
+            </div>
+          </div>
+          <div v-else-if="field.inputType === 'number'">
+            <v-text-field
+              :label="field.label"
+              :id="field.name"
+              v-model.number="model[field.name]"
+              :type="field.inputType"
+              :placeholder="field.placeholder || field.label"
+              :prefix="field.prefix"
+              :suffix="field.suffix"
+            >
+            </v-text-field>
+          </div>
+          <div v-else-if="field.inputType === 'textarea'">
+            <v-textarea
+              :label="field.label"
+              :id="field.name"
+              v-model="model[field.name]"
+              :type="field.inputType"
+              :placeholder="field.placeholder || field.label"
+              :prefix="field.prefix"
+              :suffix="field.suffix"
+            >
+            </v-textarea>
+          </div>
+          <div v-else>
+            <v-text-field
+              :label="field.label"
+              :id="field.name"
+              v-model="model[field.name]"
+              :type="field.inputType"
+              :placeholder="field.placeholder || field.label"
+              :prefix="field.prefix"
+              :suffix="field.suffix"
+            >
+            </v-text-field>
           </div>
         </div>
       </div>
@@ -118,16 +190,20 @@ export default {
                 : this.viewConfig[key].defaultValue,
             validations: this.viewConfig[key].validations,
             items: this.viewConfig[key].items || [],
+            suffix: this.viewConfig[key].suffix,
+            prefix: this.viewConfig[key].prefix,
+            options: this.viewConfig[key].options,
+            itemText: this.viewConfig[key].itemText,
+            itemValue: this.viewConfig[key].itemValue,
           });
         }
       }
-      //this.fields = dataProp;
 
       Object.entries(this.viewConfig).forEach((element) => {
         if (!this.model[element[0]])
-          this.model[element[0]] =  element[1].defaultValue;
+          this.model[element[0]] = element[1].defaultValue;
       });
-      console.log(this.model);
+
       return dataProp;
     },
   },

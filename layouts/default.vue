@@ -1,41 +1,112 @@
 <template>
   <v-app>
-    <v-navigation-drawer v-model="drawer" app>
+    <v-navigation-drawer v-model="drawer" app absolute temporary>
       <main-menu></main-menu>
     </v-navigation-drawer>
-
     <v-app-bar app color="#4CAF50">
-      <!-- <Nav></Nav> -->
-      <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon
+        v-if="loged"
+        @click="drawer = true"
+      ></v-app-bar-nav-icon>
+      <v-divider class="mx-2" inset vertical></v-divider>
 
-      <v-toolbar-title>ESB</v-toolbar-title>
+      <v-toolbar-title>
+        <div @click="goTo('/')">
+          <v-img class="rounded-lg" width="36" src="/favicon-32x32.png"></v-img>
+        </div>
+      </v-toolbar-title>
+
+      <v-spacer></v-spacer>
+      <v-divider class="mx-2" inset vertical></v-divider>
+      <div color="white" v-if="loged" @click="goTo('/checkout')">
+        <v-icon :color="percentPoints >= 100 ? 'yellow' : ''"
+          >mdi-trophy</v-icon
+        >
+        <v-progress-circular
+          :rotate="-90"
+          color="primary"
+          :value="percentPoints"
+          >{{ getTotalPoints || 0 }}</v-progress-circular
+        >
+      </div>
+      <v-divider class="mx-2" inset vertical></v-divider>
+      <div v-if="loged" @click="goTo('/checkout')">
+        <v-icon>mdi-cart</v-icon>${{ getTotal }}
+      </div>
     </v-app-bar>
 
-    <!-- Sizes your content based upon application components -->
     <v-main>
-      <!-- Provides the application the proper gutter -->
-      <v-container fluid>
-        <!-- If using vue-router -->
-        <!-- <router-view></router-view> -->
-        <Nuxt />
-      </v-container>
+      <Nuxt />
     </v-main>
 
-    <v-footer app>
-      <!-- -->
-    </v-footer>
+    <!-- <v-footer app>
+    </v-footer> -->
   </v-app>
 </template>
 
 <script>
+import { mapGetters, mapState } from 'vuex';
 import MainMenu from '../components/MainMenu.vue';
+import data from '../functions/data.js';
+
 export default {
   components: { MainMenu },
+
   data: () => ({
     drawer: false,
     group: null,
     right: null,
+    contador: 0,
   }),
+  computed: {
+    ...mapState({
+      loged: (state) => state.user.user.email,
+      points: (state) => state.user.user.points,
+    }),
+    ...mapGetters({
+      totalComprado: 'cart/totalComprado',
+    }),
+    getTotal() {
+      const total = this.totalComprado;
+      return total[total.current];
+    },
+    getTotalPoints() {
+      return this.points + this.totalComprado.points;
+    },
+    percentPoints() {
+      const totalPoint = 50;
+      return (this.getTotalPoints * 100) / totalPoint;
+    },
+  },
+  created() {
+    data.updateLocalCatalog(this);
+  },
+  async mounted() {
+    const lsCart = localStorage.getItem('cart');
+    if (lsCart) {
+      const cart = JSON.parse(lsCart);
+      this.$store.commit('cart/load', cart);
+    }
+
+    const param = await this.$dal.getById('params', '1');
+
+    if (param) {
+      this.$store.commit('cart/setParam', param);
+    }
+
+    const dbuser = await this.$dal.getById('users', this.loged);
+    if (dbuser) {
+      this.$store.commit('user/setUser', dbuser);
+    }
+  },
+  methods: {
+    goTo(path) {
+      this.$router.push(path);
+    },
+    load() {
+      data.updateLocalCatalog(this);
+    },
+  },
 };
 </script>
 
