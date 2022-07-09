@@ -76,7 +76,7 @@
       </v-chip-group>
     </v-card-text>
     <v-card-text v-else class="d-flex justify-center">
-      Puede tomar pedidos desde las {{ param.rules.horaDesde }}hs. hasta las
+      No Puede tomar pedidos desde las {{ param.rules.horaDesde }}hs. hasta las
       {{ param.rules.horaHasta }}hs.
     </v-card-text>
     <v-card-title class="d-flex justify-center">
@@ -99,6 +99,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import { mapState } from 'vuex';
+import util from '../../../../../functions/util';
 
 export default {
   data() {
@@ -119,12 +120,7 @@ export default {
       param: 'cart/getParam',
     }),
     puedeComprar() {
-      const hours = new Date().getHours();
-      const minutes = new Date().getMinutes();
-      const time = hours * 100 + minutes;
-      const desde = +this.param.rules.horaDesde.replaceAll(':', '');
-      const hasta = +this.param.rules.horaHasta.replaceAll(':', '');
-      return time >= desde && time <= hasta;
+      return util.puedeComprar(this.param.rules);
     },
     totalItemRounded() {
       const { current } = this.totalComprado;

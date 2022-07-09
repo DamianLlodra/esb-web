@@ -23,6 +23,7 @@ export default {
     '~plugins/vuetify.js',
     '~plugins/firebase.js',
     '~plugins/alertify.js',
+    { src: '~plugins/sw-update.js', mode: 'client' },
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -45,6 +46,9 @@ export default {
     manifest: {
       lang: 'es',
     },
+    // icon: {
+    //   iconSrc: './static/icon.png',
+    // },
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build

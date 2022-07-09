@@ -3,7 +3,7 @@
     <div class="flex flex-col justify-center">
       <form-generic :view-config="viewConfig" :model="data"> </form-generic>
 
-      <button @click="save">Guardar</button>
+      <v-btn class="primary" @click="save">Guardar</v-btn>
     </div>
   </div>
 </template>
@@ -14,15 +14,15 @@ export default {
     return {
       data: {},
       viewConfig: {
-        nombre: {
-          dataType: String,
-        },
+        nombre: {},
         razonSocial: {},
         domicilioFiscal: {},
         domicilioEntrega: {},
+        cuit: {},
         documento: {},
         telefono: {},
         email: {},
+        horarioDeAtencion: {},
       },
     };
   },
@@ -31,13 +31,31 @@ export default {
       data: {},
     };
   },
-  mounted() {
-    const { displayName, email, phoneNumber } = this.$store.state.user.user;
-    this.data = {
-      nombre: displayName,
-      email,
-      telefono: phoneNumber,
-    };
+  async mounted() {
+    const { displayName, email } = this.$store.state.user.user;
+
+    let customer = await this.$dal.getById('customer', email);
+
+    if (customer) {
+      customer.id = email;
+      customer.nombre = displayName;
+      customer.email = email;
+    } else {
+      customer = {
+        id: email,
+        nombre: displayName,
+        email,
+        telefono: '',
+        razonSocial: '',
+        domicilioFiscal: '',
+        domicilioEntrega: '',
+        cuit: '',
+        documento: '',
+        horarioDeAtencion: '',
+      };
+    }
+
+    this.data = customer;
   },
   methods: {
     save() {

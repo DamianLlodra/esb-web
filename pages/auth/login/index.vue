@@ -25,39 +25,42 @@ export default {
     return {
       email: '',
       password: '',
-      error: null,
     };
   },
   methods: {
     async googleLogin() {
       try {
+        let redirectUri = '/';
         const result = await this.$firebase
           .auth()
           .signInWithPopup(new this.$firebase.auth.GoogleAuthProvider());
 
         const { displayName, email } = result.user;
 
-        const user = await this.$dal.getById('users', email);
+        let user = await this.$dal.getById('users', email);
+
         if (!user) {
-          await this.$dal.save('users', {
+          redirectUri = '/customer/profile';
+          user = {
             displayName,
             email,
             isAdmin: false,
             id: email,
             points: 0,
-          });
+          };
+          await this.$dal.save('users', user);
         }
         this.$store.commit('user/setUser', {
+          id: email,
           displayName,
           email,
           isAdmin: user.isAdmin,
           points: user.points,
         });
 
-        this.$router.push('/');
+        this.$router.push(redirectUri);
       } catch (e) {
         console.log(e);
-        this.error = e.response.data.message[0].messages[0].message;
       }
     },
   },

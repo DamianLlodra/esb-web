@@ -16,9 +16,8 @@
       {{ totalComprado[totalComprado.current] - premio }}</v-card-text
     >
 
-    <v-card-text class="text-h6">Fecha de entrega: {{ entrega }}</v-card-text>
     <v-card-text class="text-h6"
-      >Dirección de entrega: {{ direccion }}</v-card-text
+      >Dirección de entrega: {{ customer.domicilioEntrega }}</v-card-text
     >
     <v-card-actions>
       <v-btn color="primary" @click="verCompra">
@@ -36,12 +35,14 @@
 <script>
 import { mapGetters } from 'vuex';
 import { mapState } from 'vuex';
+import util from '../../functions/util';
+
 export default {
   data() {
     return {
       entrega: new Date().toLocaleDateString(),
       entregaId: new Date().toISOString().substring(0, 10),
-      direccion: '', // TODO: obtener de la sesion, o de la base de datos. Valor requerido
+      customer: {},
     };
   },
   computed: {
@@ -53,6 +54,7 @@ export default {
     }),
     ...mapGetters({
       totalComprado: 'cart/totalComprado',
+      param: 'cart/getParam',
     }),
     premio() {
       if (this.canjePuntos) {
@@ -64,22 +66,47 @@ export default {
       } else return 0;
     },
   },
+  created() {
+    this.customer = this.loadCustomer();
+  
+  },
   methods: {
+    async loadCustomer() {
+      this.customer = await this.$dal.getById(
+        'customer',
+        this.$store.state.user.user.email
+      );
+    },
+
     // TODO: IR A PEDIDO CONFIRMADO LUEGO DE CONFIRMAR
     // mostrar alert indicando que se confirmo el pedido
-
     async confirmarPedido() {
+      if (!util.puedeComprar(this.param.rules)) {
+        this.$alertify.confirm(
+          'Si continua el pedido sera validado despues de las ' +
+            this.param.rules.horaHasta +
+            ' hrs.',
+
+          async () => await this.grabarPedido(),
+          () => this.$alertify.error('Pedido no confirmado')
+        );
+      } else await this.grabarPedido();
+    },
+    async grabarPedido() {
       try {
-        await this.$dal.save('pedidos', {
+        const pedidoToSave = {
           id: this.entregaId + '-' + this.$store.state.user.user.email,
-          usuario: this.$store.state.user.user.email,
+          usuario: this.customer.nombre,
+          razonsocial: this.customer.razonSocial,
           fecha: this.entregaId,
-          direccion: this.direccion,
+          direccion: this.customer.domicilioEntrega,
           total: this.totalComprado[this.totalComprado.current],
           puntos: this.totalComprado.points,
           productos: this.cart,
           currentPrice: this.totalComprado.current,
-        });
+        };
+        console.log(pedidoToSave);
+        await this.$dal.save('pedidos', pedidoToSave);
         const user = { ...this.$store.state.user.user };
         user.points += this.totalComprado.points;
         await this.$dal.save('users', user);

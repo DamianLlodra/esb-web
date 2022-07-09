@@ -97,6 +97,7 @@ export default {
   methods: {
     async updateProducts() {
       const file = this.file;
+      await this.uploadToFirebase(file);
       if (!file) {
         return;
       }
@@ -345,6 +346,24 @@ export default {
         });
       }
       return { productsFromCsv, categoriesFromCsv, subcategoriesFromCsv };
+    },
+    async uploadToFirebase(file) {
+      if (file) {
+        const storage = this.$firebase.storage();
+        const storageRef = storage.ref();
+        const imageRef = storageRef.child('/xlsx/pedido.xlsx');
+
+        try {
+          await imageRef.put(file);
+          this.$alertify.success('Archivo subido correctamente');
+          this.$ref.inputFile.value = '';
+        } catch (error) {
+          console.log(error);
+          this.$alertify.success('Error al subir el archivo');
+        }
+      } else {
+        this.$alertify.error('Debe seleccionar un archivo.');
+      }
     },
   },
 };

@@ -19,11 +19,14 @@
       <v-spacer></v-spacer>
       <v-divider class="mx-2" inset vertical></v-divider>
       <div color="white" v-if="loged" @click="goTo('/checkout')">
+        <v-icon :color="percentPoints >= 100 ? 'yellow' : ''"
+          >mdi-trophy</v-icon
+        >
         <v-progress-circular
           :rotate="-90"
           color="primary"
           :value="percentPoints"
-          >{{ getTotalPoints }}</v-progress-circular
+          >{{ getTotalPoints || 0 }}</v-progress-circular
         >
       </div>
       <v-divider class="mx-2" inset vertical></v-divider>
@@ -68,8 +71,6 @@ export default {
       return total[total.current];
     },
     getTotalPoints() {
-      console.log(this.points);
-      console.log(this.totalComprado.points);
       return this.points + this.totalComprado.points;
     },
     percentPoints() {
@@ -78,12 +79,6 @@ export default {
     },
   },
   created() {
-    // const lastForceUpdate = await this.$dal.getById('config', 'lastForceUpdate');
-    // if (lastForceUpdate) {
-    //   this.$dal.update('config', {
-    //     lastForceUpdate: new Date(),
-    //   });
-    // }
     data.updateLocalCatalog(this);
   },
   async mounted() {
