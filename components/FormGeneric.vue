@@ -1,7 +1,6 @@
 <template>
   <form class="p-1">
     <div v-for="field in getFields" :key="field.name">
-      
       <div class="flex flex-row m-2 justify-center">
         <div class="flex flex-col">
           <div v-if="field.inputType === 'select'">
@@ -34,7 +33,6 @@
             ></v-file-input>
           </div>
           <div v-else-if="field.inputType === 'checkbox'">
-            
             <div class="flex flex-row items-center m-2">
               <!-- <input
                 :id="field.name"
@@ -55,7 +53,6 @@
                 </v-checkbox>
               </div>
               <div v-else>
-                
                 <v-checkbox
                   :id="field.name"
                   v-model="model[field.name]"

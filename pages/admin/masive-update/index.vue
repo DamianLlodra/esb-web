@@ -30,18 +30,24 @@
                 label="Precios"
                 color="primary"
               ></v-checkbox>
-              <v-checkbox
+              <!-- <v-checkbox
                 v-model="actualizarCategorias"
                 label="Categorias y Subcategorias"
                 color="primary"
-              ></v-checkbox>
+              ></v-checkbox> -->
+              <v-text-field
+                label="Fecha de Reparto"
+                type="date"
+                v-model="proximaFechaDeReparto"
+                @change="saveFechaReparto"
+              ></v-text-field>
             </v-card-text>
             <v-card-actions>
               <v-btn
                 class="mx-auto"
                 color="primary"
+                :disabled="!file || !proximaFechaDeReparto"
                 @click="updateProducts"
-                :disabled="!file"
                 ><div>
                   <v-progress-circular
                     v-if="loading"
@@ -69,7 +75,7 @@ export default {
   data() {
     return {
       items: [],
-      file: '',
+      file: null,
       imagen: '',
       categories: [],
       progressCSV: 1,
@@ -82,6 +88,7 @@ export default {
       actualizarCategorias: false,
       headersConfig: {},
       loading: false,
+      proximaFechaDeReparto: '',
     };
   },
   computed: {},
@@ -95,6 +102,12 @@ export default {
     });
   },
   methods: {
+    async saveFechaReparto() {
+      await this.$dal.save('params', {
+        id: '1',
+        proximaFechaDeReparto: this.proximaFechaDeReparto,
+      });
+    },
     async updateProducts() {
       const file = this.file;
       await this.uploadToFirebase(file);

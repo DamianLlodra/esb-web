@@ -59,10 +59,40 @@ export default {
   },
   methods: {
     save() {
+      if (
+        !this.validarCampoNotEmpty('Nombre', this.data.nombre) ||
+        !this.validarCampoNotEmpty('Razon Social', this.data.razonSocial) ||
+        !this.validarCampoNotEmpty(
+          'Domicilio Fiscal',
+          this.data.domicilioFiscal
+        ) ||
+        !this.validarCampoNotEmpty(
+          'Domicilio de Entrega',
+          this.data.domicilioEntrega
+        ) ||
+        !this.validarCampoNotEmpty('Cuit', this.data.cuit) ||
+        !this.validarCampoNotEmpty('Documento', this.data.documento) ||
+        !this.validarCampoNotEmpty('Telefono', this.data.telefono) ||
+        !this.validarCampoNotEmpty('Email', this.data.email) ||
+        !this.validarCampoNotEmpty(
+          'Horario de Atencion',
+          this.data.horarioDeAtencion
+        )
+      ) {
+        return;
+      }
+
       this.$dal.save('customer', this.data).then(() => {
         this.$store.commit('user/setUser', this.data);
         this.$router.push('/');
       });
+    },
+    validarCampoNotEmpty(label, campo) {
+      if (!campo) {
+        this.$alertify.error(`El campo ${label} es obligatorio`);
+        return false;
+      }
+      return true;
     },
   },
 };

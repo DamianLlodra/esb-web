@@ -13,7 +13,9 @@
       <p v-for="(p, k) in getParrafos" :key="k">{{ p }}</p>
     </v-card-text>
     <v-card-actions v-if="loged" class="justify-center">
-      <v-btn class="green" @click="goto('/category')">Empezar a comprar</v-btn>
+      <v-btn class="green" @click="goto('/category')"
+        >Empezar a comprar</v-btn
+      >
     </v-card-actions>
   </v-card>
 </template>
