@@ -184,6 +184,11 @@ export default {
       const wb = await this.generateXlsFromFile(order);
 
       writeFile(wb, order.id + '.xlsx');
+
+      await this.$dal.save('pedidos', {
+        id: order.id,
+        estado: 'PROCESADO',
+      });
     },
     async downloadZip() {
       const zip = new JSZip();

@@ -39,6 +39,7 @@ export default {
             precio1,
             precio2,
             hayStock,
+            destacado,
           } = productDB;
           productLocal.id = id;
           productLocal.producto = producto;
@@ -48,6 +49,7 @@ export default {
           productLocal.precio1 = precio1;
           productLocal.precio2 = precio2;
           productLocal.hayStock = hayStock;
+          productLocal.destacado = destacado;
         }
       });
       localStorage.setItem('products', JSON.stringify(productsLocal));

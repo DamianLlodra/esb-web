@@ -11,20 +11,25 @@
     <v-card-text v-if="premio > 0" class="text-h6"
       >Descuento por puntos ${{ premio }}</v-card-text
     >
-    <v-card-text class="text-h6"
-      >Total a pagar $
-      {{ totalComprado[totalComprado.current] - premio }}</v-card-text
-    >
-
+    <v-card-text class="text-h6">Total a pagar $ {{ totalAPagar }}</v-card-text>
     <v-card-text class="text-h6"
       >Dirección de entrega: {{ customer.domicilioEntrega }}</v-card-text
     >
+    <v-card-text class="text-h6">
+      Fecha de entrega:
+      <v-text-field type="date" v-model="fechaDeEntrega"></v-text-field>
+    </v-card-text>
+
     <v-card-actions>
       <v-btn color="primary" @click="verCompra">
         <span>Ver Compra</span>
         <v-icon>mdi-cart</v-icon>
       </v-btn>
-      <v-btn color="green" @click="confirmarPedido">
+      <v-btn
+        :disabled="totalComprado[totalComprado.current] == 0"
+        color="green"
+        @click="confirmarPedido"
+      >
         <span>Confirmar</span>
         <v-icon>mdi-check</v-icon></v-btn
       >
@@ -40,8 +45,8 @@ import util from '../../functions/util';
 export default {
   data() {
     return {
-      entrega: new Date().toLocaleDateString(),
-      entregaId: new Date().toISOString().substring(0, 10),
+      fechaDeEntrega: '',
+      fechaDeEntregaProgramada: '',
       customer: {},
     };
   },
@@ -65,28 +70,46 @@ export default {
         return premio && premio.length > 0 ? premio[0].importe : 0;
       } else return 0;
     },
+    totalAPagar() {
+      return this.totalComprado[this.totalComprado.current] - this.premio > 0
+        ? this.totalComprado[this.totalComprado.current] - this.premio
+        : 0;
+    },
+    entregaId() {
+      const fecha = new Date(this.fechaDeEntrega);
+      return fecha.toISOString().substring(0, 10);
+    },
   },
   created() {
     this.customer = this.loadCustomer();
-  
+    this.loadFechaEntrega();
   },
   methods: {
+    async loadFechaEntrega() {
+      const params = await this.$dal.getById('params', '1');
+      this.fechaDeEntrega = params.proximaFechaDeReparto;
+      this.fechaDeEntregaProgramada = params.proximaFechaDeReparto;
+    },
     async loadCustomer() {
       this.customer = await this.$dal.getById(
         'customer',
         this.$store.state.user.user.email
       );
     },
-
     // TODO: IR A PEDIDO CONFIRMADO LUEGO DE CONFIRMAR
     // mostrar alert indicando que se confirmo el pedido
     async confirmarPedido() {
+      if (this.fechaDeEntrega < this.fechaDeEntregaProgramada) {
+        this.$alertify.error(
+          'La fecha de entrega no puede ser menor a la programada'
+        );
+        return;
+      }
       if (!util.puedeComprar(this.param.rules)) {
         this.$alertify.confirm(
           'Si continua el pedido sera validado despues de las ' +
             this.param.rules.horaHasta +
             ' hrs.',
-
           async () => await this.grabarPedido(),
           () => this.$alertify.error('Pedido no confirmado')
         );
@@ -96,6 +119,7 @@ export default {
       try {
         const pedidoToSave = {
           id: this.entregaId + '-' + this.$store.state.user.user.email,
+          userId: this.$store.state.user.user.email,
           usuario: this.customer.nombre,
           razonsocial: this.customer.razonSocial,
           fecha: this.entregaId,
@@ -104,11 +128,14 @@ export default {
           puntos: this.totalComprado.points,
           productos: this.cart,
           currentPrice: this.totalComprado.current,
+          estado: 'PENDIENTE',
         };
-        console.log(pedidoToSave);
         await this.$dal.save('pedidos', pedidoToSave);
         const user = { ...this.$store.state.user.user };
-        user.points += this.totalComprado.points;
+        if (this.premio > 0) {
+          user.points = user.points - this.points;
+        } else user.points += this.totalComprado.points;
+
         await this.$dal.save('users', user);
         this.$store.commit('cart/removeAll');
         this.$store.commit('user/setUser', user);

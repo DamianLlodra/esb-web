@@ -111,6 +111,15 @@
           </v-toolbar-title>
         </v-toolbar>
       </template>
+      <template v-slot:item.destacado="{ item }">
+        <v-icon
+          v-if="item.destacado"
+          color="orange"
+          text-color="white"
+          label="!"
+          >mdi-star</v-icon
+        >
+      </template>
       <template v-slot:item.actions="{ item }">
         <v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
         <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
@@ -195,6 +204,14 @@ export default {
           required: true,
           defaultValue: '',
         },
+
+        destacado: {
+          inputType: 'checkbox',
+          label: 'Destacado',
+          required: true,
+          defaultValue: false,
+        },
+
         /* imagen: {
           inputType: 'file',
           label: 'Imagen',
@@ -209,6 +226,7 @@ export default {
       loading: false,
       headers: [
         { text: 'id', value: 'id', canSearch: true },
+        { text: '!', value: 'destacado', sorteable: false, canSearch: false },
         { text: 'Producto', value: 'producto', canSearch: true },
         { text: 'Imagen', value: 'imagen' },
         { text: 'Lista', value: 'lista' },
@@ -342,7 +360,7 @@ export default {
       if (!item.imagenFrom) this.$set(item, 'imagenFrom', '');
       if (!item.familia) this.$set(item, 'familia', '');
       if (!item.subfamilia) this.$set(item, 'subfamilia', '');
-
+      if (item.destacado === undefined) this.$set(item, 'destacado', false);
       this.selectedProduct = item;
       this.getSubcategories();
       this.dialog = true;
@@ -375,6 +393,7 @@ export default {
       }
 
       this.loading = true;
+      this.selectedProduct.lastUpdate = new Date();
       this.$dal
         .save('products', this.selectedProduct)
         .then(() => {
@@ -455,7 +474,7 @@ export default {
             producto.subfamilia = sf[1];
           }
         } */
-  
+
         await this.$dal.save('products', producto);
       }
     },

@@ -57,6 +57,11 @@ export default {
       items: [
         { title: 'Categorias', icon: 'mdi-folder-multiple', path: '/category' },
         { title: 'Productos', icon: 'mdi-shopping', path: '/catalogue' },
+        {
+          title: 'Destacados',
+          icon: 'mdi-star',
+          path: '/category/destacados/todos',
+        },
         { title: 'Carrito', icon: 'mdi-cart', path: '/cart' },
         { title: 'Mis compras', icon: 'mdi-image', path: '/customer/orders' },
         { title: 'Mis datos', icon: 'mdi-account', path: '/customer/profile' },

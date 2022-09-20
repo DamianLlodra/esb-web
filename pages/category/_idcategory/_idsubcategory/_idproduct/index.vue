@@ -52,7 +52,7 @@
       </p>
     </div> -->
 
-    <v-card-text v-if="puedeComprar" class="d-flex justify-center">
+    <v-card-text  class="d-flex justify-center">
       <v-chip-group>
         <v-chip
           v-if="!product.amount && product.price"
@@ -75,10 +75,10 @@
         >
       </v-chip-group>
     </v-card-text>
-    <v-card-text v-else class="d-flex justify-center">
+    <!-- <v-card-text v-else class="d-flex justify-center">
       No Puede tomar pedidos desde las {{ param.rules.horaDesde }}hs. hasta las
       {{ param.rules.horaHasta }}hs.
-    </v-card-text>
+    </v-card-text> -->
     <v-card-title class="d-flex justify-center">
       <span v-if="product.amount">Importe: ${{ totalItemRounded }}</span>
     </v-card-title>

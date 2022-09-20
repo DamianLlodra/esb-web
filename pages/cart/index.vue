@@ -13,7 +13,7 @@
             :key="index"
             :title="item.name"
             :subtitle="'Precio: $' + item.price"
-            :image="item.image"
+            :image="item.picture"
             :price="item.price"
             :amount="item.amount"
             @changeAmount="addOrder($event, item)"

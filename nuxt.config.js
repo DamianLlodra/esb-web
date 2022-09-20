@@ -46,6 +46,13 @@ export default {
     manifest: {
       lang: 'es',
     },
+    meta: {
+      name: 'ESB-web',
+    },
+    workbox: {
+      importScripts: ['custom-sw.js'],
+    },
+
     // icon: {
     //   iconSrc: './static/icon.png',
     // },

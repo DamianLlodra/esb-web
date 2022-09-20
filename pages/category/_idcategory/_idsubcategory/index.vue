@@ -6,7 +6,7 @@
           Categorias
         </v-btn>
       </v-breadcrumbs-item>
-      <v-breadcrumbs-item>
+      <v-breadcrumbs-item v-if="category != 'destacados'">
         <v-btn
           class="mb-2"
           color="primary"
@@ -35,9 +35,7 @@
         >
           <v-sheet
             elevation="18"
-            @click="
-              goTo('/category/' + category + '/' + subcategory + '/' + item.id)
-            "
+            @click="goTo(item.id)"
             class="d-flex flex-column justify-center align-center"
           >
             <v-img
@@ -107,11 +105,36 @@ export default {
     const { idcategory, idsubcategory } = this.$route.params;
     this.category = idcategory;
     this.subcategory = idsubcategory;
-    this.loadProducts();
+    if (idcategory === 'destacados' && idsubcategory === 'todos')
+      this.loadDestacados();
+    else this.loadProducts();
   },
   methods: {
     goTo(path) {
-      this.$router.push(path);
+      this.$router.push(this.$route.fullPath + '/' + path);
+    },
+    loadDestacados() {
+      const linkpicture =
+        'https://firebasestorage.googleapis.com/v0/b/esb-web.appspot.com/o/fotos%2F';
+
+      const products = JSON.parse(localStorage.getItem('products'));
+
+      this.products = products
+        .filter((item) => item.lista > 0 && item.hayStock && item.destacado)
+        .map((r) => {
+          return {
+            id: r.id,
+            name: r.producto,
+            precio: r.lista,
+            errorPicure: false,
+            picture: r.picture
+              ? linkpicture + r.picture + '?alt=media'
+              : linkpicture + r.id + '.PNG?alt=media',
+            hayStock: r.hayStock,
+            familia: r.familia,
+            subfamilia: r.subfamilia,
+          };
+        });
     },
     loadProducts() {
       const linkpicture =
@@ -131,6 +154,8 @@ export default {
               ? linkpicture + r.picture + '?alt=media'
               : linkpicture + r.id + '.PNG?alt=media',
             hayStock: r.hayStock,
+            familia: r.familia,
+            subfamilia: r.subfamilia,
           };
         });
     },
